@@ -78,7 +78,7 @@ CREATE TABLE `personal` (
 --
 
 INSERT INTO `personal` (`idPersonal`, `nombre`, `apellido`, `DNI`, `rol`, `fechaIngreso`, `fechaBaja`) VALUES
-(1, 'robert', 'calamar', 23628817, '', '0000-00-00', '2023-11-05'),
+(1, '', '', -1, '', '0000-00-00', '0000-00-00'),
 (2, 'esteban', 'perex', 44628819, '', '2023-11-03', NULL),
 (3, 'jorge', 'perex', 33228819, '', '2023-11-03', NULL),
 (4, 'jon', 'juan', 23628812, '', '0000-00-00', NULL),

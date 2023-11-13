@@ -67,16 +67,20 @@ class PedidoController extends Pedido implements IApiUsable {
             ->withHeader('Content-Type', 'application/json');
     }
 
-//CONTROLAR
     public function ModificarUno($request, $response, $args) {
         $parametros = $request->getParsedBody();
-        $idPedido = $parametros['idPedido'];
+        $idPedido = $args['idPedido'];
         $estado = $parametros['estado'];
 
-        Pedido::modificarPedido($idPedido, $estado);
+        $payload = json_encode(array("mensaje" => "Hubo un error al modificar el pedido"));
 
-        $payload = json_encode(array("mensaje" => "Pedido modificado con exito"));
-
+        foreach(Pedido::$estadosDisponibles as $estadoDisp){
+            if($estadoDisp ==  $estado){
+                Pedido::modificarPedido($idPedido, $estado);
+                $payload = json_encode(array("mensaje" => "Pedido modificado con exito"));
+                break;
+            }
+        }
         $response->getBody()->write($payload);
         return $response
             ->withHeader('Content-Type', 'application/json');

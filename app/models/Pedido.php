@@ -5,6 +5,11 @@ class Pedido {
     public $idPedido;
     public $idMesa;
     public $estado;
+    public static $estadosDisponibles = [
+        "pendiente",            //solo mozos y socios pueden settear este estado
+        "en preparación",       //solo empleados de cocina, barra y socios pueden settear este estado
+        "listo para servir",    //solo empleados de cocina, barra y socios pueden settear este estado
+        "servido"];             //solo mozos y socios pueden settear este estado
 
     public function crearPedido() {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
@@ -84,8 +89,8 @@ class Pedido {
     public static function modificarPedido($idPedido, $estado) {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDato->prepararConsulta("UPDATE pedido
-                                                      SET estado = '{$estado}',
-                                                      WHERE idPedido = {$idPedido}");
+                                                      SET estado = '{$estado}'
+                                                      WHERE idPedido = '{$idPedido}'");
         $consulta->execute();
     }
 
