@@ -1,5 +1,6 @@
 <?php
 
+
 class Pedido {
     public $idPedido;
     public $idMesa;
@@ -9,7 +10,7 @@ class Pedido {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedido (idPedido, idMesa, estado) 
         VALUES (:idPedido, :idMesa, :estado)");
-        $consulta->bindValue(':idPedido', '',PDO::PARAM_INT);
+        $consulta->bindValue(':idPedido', $this->generarCodigo(3),PDO::PARAM_STR);
         $consulta->bindValue(':idMesa', $this->idMesa, PDO::PARAM_INT);
         $consulta->bindValue(':estado', $this->estado, PDO::PARAM_STR);
         $consulta->execute();
@@ -32,9 +33,38 @@ class Pedido {
                                                        WHERE idPedido = :idPedido");
         $consulta->bindValue(':idPedido', $idPedido, PDO::PARAM_INT);
         $consulta->execute();
+        
         return $consulta->fetchObject('Pedido');
     }
 
+    public static function obtenerProdcutosDelPedido($idPedido) {
+        
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("
+        SELECT ped.idPedido, ped.idMesa, ped.estado , nombre as nombre_del_prodcuto 
+        FROM pedido as ped
+        inner join productopedido as prodPed
+        on ped.idPedido = prodPed.idPedido
+        inner join producto as prod
+        on prodPed.idProducto = prod.idProducto
+        where :idPedido = ped.idPedido");
+
+        $consulta->bindValue(':idPedido', $idPedido, PDO::PARAM_INT);
+        $consulta->setFetchMode(PDO::FETCH_ASSOC);
+
+        if ($consulta) {
+            try {
+                $consulta->execute();
+                while ($row = $consulta->fetch()) {
+                    $chars[] = $row;
+                }
+            }
+            catch (PDOException $e) {
+                var_dump($e);
+            }
+        }
+        return $chars;
+    }
     public static function obtenerIdPedido($idPedido) {
         
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
@@ -45,7 +75,12 @@ class Pedido {
         $consulta->execute();
         return $consulta->fetchObject('Pedido');
     }
-
+    public static function obtenerUltimoId(){
+            $objAccesoDatos = AccesoDatos::obtenerInstancia();
+            $consulta = $objAccesoDatos->prepararConsulta("SELECT MAX(idPedido) as ultimoId FROM pedido");
+            $consulta->execute();
+            return $consulta->fetchObject('Pedido');
+    }
     public static function modificarPedido($idPedido, $estado) {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDato->prepararConsulta("UPDATE pedido
@@ -61,5 +96,25 @@ class Pedido {
              SET estado = 'cerrado' 
              WHERE idPedido = {$idPedido}");
         $consulta->execute();
+    }
+
+    public static function generarCodigo(){
+        do{
+
+            $codigo = "";
+            $primerChar = rand(0,9);
+            $segundoChar = rand(0,9);
+            $codigo = strval($primerChar) . strval($segundoChar);
+            $codigo .= Utilities::generateRandomString(3);
+
+            $objAccesoDato = AccesoDatos::obtenerInstancia();
+            $consulta = $objAccesoDato->prepararConsulta("SELECT count(idPedido) as cont
+                                                        FROM pedido 
+                                                        WHERE idPedido = '{$codigo}'");
+            $consulta->execute();
+            $resultado = $consulta->fetch();
+        }while($resultado['cont'] != 0);
+
+        return $codigo;
     }
 }

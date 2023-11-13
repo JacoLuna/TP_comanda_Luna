@@ -3,9 +3,9 @@ require_once './models/Pedido.php';
 require_once './interfaces/IApiUsable.php';
 
 class PedidoController extends Pedido implements IApiUsable {
+
     public function CargarUno($request, $response, $args) {
         $parametros = $request->getParsedBody();
-
         $idMesa = $parametros['idMesa'];
         $estado = $parametros['estado'];
 
@@ -14,9 +14,28 @@ class PedidoController extends Pedido implements IApiUsable {
         $usr->estado = $estado;
         $usr->crearPedido();
 
-        $payload = json_encode(array("mensaje" => "Pedido creado con exito"));
+        $idPedido = Pedido::obtenerUltimoId();
+        
+        foreach($parametros['productos'] as $producto){
+            $prodActual = Producto::obtenerProductoNombre($producto);
+            
+            $productoPedido = new productoPedido();
+            $productoPedido->idProducto = $prodActual->idProducto;
+            $productoPedido->idPedido = $idPedido->ultimoId;
+            $productoPedido->tiempoPreparacion =  $prodActual->tiempoPreparacion;
+            $productoPedido->crearProductoPedido();
+        }
 
+        if (!$_FILES["imagen"]["error"]) {
+            $partesRuta = explode(".", $_FILES["imagen"]["name"]);
+            $extension = end($partesRuta);
+            $destino = "img/" . $idPedido->ultimoId . "-" . $usr->idMesa . '.' . $extension;
+            move_uploaded_file($_FILES["imagen"]["tmp_name"], $destino);
+        }
+
+        $payload = json_encode(array("mensaje" => "Pedido creado con exito, su codigo es " . $idPedido->ultimoId));
         $response->getBody()->write($payload);
+
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
@@ -24,8 +43,10 @@ class PedidoController extends Pedido implements IApiUsable {
     public function TraerUno($request, $response, $args) {
         // Buscamos pedido por id
         $usr = $args['idPedido'];
-        $pedido = Pedido::obtenerPedido($usr);
-        $payload = json_encode($pedido);
+        
+        $pedidoPrductos = Pedido::obtenerProdcutosDelPedido($usr);
+        
+        $payload = json_encode($pedidoPrductos);
 
         $response->getBody()->write($payload);
         return $response

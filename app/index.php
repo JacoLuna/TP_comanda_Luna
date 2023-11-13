@@ -11,6 +11,10 @@ require_once './controllers/PersonalController.php';
 require_once './controllers/MesaController.php';
 require_once './controllers/PedidoController.php';
 require_once './controllers/ProductoController.php';
+require_once './models/productoPedido.php';
+require_once './middlewares/LoggerMiddleware.php';
+require_once './middlewares/StateChangeMiddleware.php';
+require_once './utilities/Utilities.php';
 
 $app = AppFactory::create();
 
@@ -26,18 +30,24 @@ $app->group('/personal', function (RouteCollectorProxy $group) {
 
   $group->get('[/]', \PersonalController::class . ':TraerTodos');
   $group->get('/{DNI}', \PersonalController::class . ':TraerUno');
-  $group->post('[/]', \PersonalController::class . ':CargarUno');
-  $group->put('/{DNI}', \PersonalController::class . ':ModificarUno');
-  $group->delete('/{DNI}', \PersonalController::class . ':BorrarUno');
+  $group->post('[/]', \PersonalController::class . ':CargarUno')
+    ->add(new LoggerMiddleware);
+  $group->put('/{DNI}', \PersonalController::class . ':ModificarUno')
+    ->add(new LoggerMiddleware);
+  $group->delete('/{DNI}', \PersonalController::class . ':BorrarUno')
+    ->add(new LoggerMiddleware);
 });
 
 $app->group('/mesa', function (RouteCollectorProxy $group) {
 
   $group->get('[/]', \MesaController::class . ':TraerTodos');
-  $group->get('/{codigo}', \MesaController::class . ':TraerUno');
-  $group->post('[/]', \MesaController::class . ':CargarUno');
-  $group->put('/{codigo}', \MesaController::class . ':ModificarUno');
-  $group->delete('/{codigo}', \MesaController::class . ':BorrarUno');
+  $group->get('/{idMesa}', \MesaController::class . ':TraerUno');
+  $group->post('[/]', \MesaController::class . ':CargarUno')
+    ->add(new LoggerMiddleware);
+  $group->put('/{idMesa}', \MesaController::class . ':ModificarUno')
+    ->add(new LoggerMiddleware);
+  $group->delete('/{idMesa}', \MesaController::class . ':BorrarUno')
+    ->add(new LoggerMiddleware);
 });
 
 $app->group('/pedido', function (RouteCollectorProxy $group) {
@@ -45,7 +55,9 @@ $app->group('/pedido', function (RouteCollectorProxy $group) {
   $group->get('[/]', \PedidoController::class . ':TraerTodos');
   $group->get('/{idPedido}', \PedidoController::class . ':TraerUno');
   $group->post('[/]', \PedidoController::class . ':CargarUno');
-  $group->put('/{idPedido}', \PedidoController::class . ':ModificarUno');
+  $group->put('/{idPedido}', \PedidoController::class . ':ModificarUno')
+  ->add(new LoggerMiddleware());
+  // ->add(new StateChangeMiddleware());
   $group->delete('/{idPedido}', \PedidoController::class . ':BorrarUno');
 });
 

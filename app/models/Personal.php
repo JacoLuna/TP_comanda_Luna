@@ -7,16 +7,16 @@ class Personal {
     public $DNI;
     public $rol;
     public $fechaIngreso;
-    public $fechaBaja;
+    public $fechaBaja = null;
 
     public function crearPersonal() {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO personal (idPersonal, nombre, apellido, DNI, rol, fechaIngreso, fechaBaja) 
-        VALUES (:idPersonal, :nombre, :apellido, :DNI, :rol, :fechaIngreso, :fechaIngreso, :fechaBaja)");
+        VALUES (:idPersonal, :nombre, :apellido, :DNI, :rol, :fechaIngreso, :fechaBaja)");
         // $consulta->bindValue(':idPersonal', $this->idPersonal, PDO::PARAM_STR);
         //tanto 0 como '' es valido para autoincrement
         // $consulta->bindValue(':idPersonal', 0,PDO::PARAM_STR);
-        $consulta->bindValue(':idPersonal', '',PDO::PARAM_INT);
+        $consulta->bindValue(':idPersonal', '', PDO::PARAM_INT);
         $consulta->bindValue(':nombre', $this->nombre, PDO::PARAM_STR);
         $consulta->bindValue(':apellido', $this->apellido, PDO::PARAM_STR);
         $consulta->bindValue(':DNI', $this->DNI, PDO::PARAM_INT);
@@ -24,7 +24,6 @@ class Personal {
         $consulta->bindValue(':fechaIngreso', $this->fechaIngreso, PDO::PARAM_STR);
         $consulta->bindValue(':fechaBaja', $this->fechaBaja, PDO::PARAM_STR);
         $consulta->execute();
-
         return $objAccesoDatos->obtenerUltimoId();
     }
 
@@ -36,7 +35,7 @@ class Personal {
     }
 
     public static function obtenerPersonal($DNI) {
-        
+
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT idPersonal, nombre, apellido, DNI, rol, fechaIngreso 
                                                        FROM personal 
@@ -47,7 +46,7 @@ class Personal {
     }
 
     public static function obtenerIdPersonal($DNI) {
-        
+
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT idPersonal
                                                        FROM personal 
@@ -59,6 +58,7 @@ class Personal {
 
     public static function modificarPersonal($idPersonal, $nombre, $apellido, $DNI, $rol, $fechaIngreso) {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
+
         $consulta = $objAccesoDato->prepararConsulta("UPDATE personal
                                                       SET nombre = '{$nombre}', 
                                                           apellido = '{$apellido}', 
@@ -76,5 +76,17 @@ class Personal {
         $fecha = new DateTime();
         $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d H:i:s'));
         $consulta->execute();
+    }
+
+    function getValues() {
+        return [
+            'idPersonal' => $this->idPersonal,
+            'nombre' => $this->nombre,
+            'apellido' => $this->apellido,
+            'DNI' => $this->DNI,
+            'rol' => $this->rol,
+            'fechaIngreso' => $this->fechaIngreso,
+            'fechaBaja' => $this->fechaBaja
+        ];
     }
 }

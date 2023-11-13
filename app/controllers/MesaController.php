@@ -6,14 +6,16 @@ class MesaController extends Mesa implements IApiUsable {
     public function CargarUno($request, $response, $args) {
         $parametros = $request->getParsedBody();
 
+        // $idMesa = $parametros['idMesa'];
         $idPersonal = $parametros['idPersonal'];
         $cantComensales = $parametros['cantComensales'];
-        $codigo = $parametros['codigo'];
 
         $usr = new Mesa();
+        // $usr->idMesa = $idMesa;
         $usr->idPersonal = $idPersonal;
         $usr->cantComensales = $cantComensales;
-        $usr->codigo = $codigo;
+        $usr->rota = false;
+        $usr->estado = Mesa::$estadosDisponibles[3];
         $usr->crearMesa();
 
         $payload = json_encode(array("mensaje" => "Mesa creada con exito"));
@@ -23,8 +25,8 @@ class MesaController extends Mesa implements IApiUsable {
             ->withHeader('Content-Type', 'application/json');
     }
     public function TraerUno($request, $response, $args) {
-        $usr = $args['codigo'];
-        $mesa = Mesa::obtenerMesa($usr);
+        $usr = $args['idMesa'];
+        $mesa = Mesa::obtenerUnaMesa($usr);
         $payload = json_encode($mesa);
 
         $response->getBody()->write($payload);
@@ -32,9 +34,14 @@ class MesaController extends Mesa implements IApiUsable {
             ->withHeader('Content-Type', 'application/json');
     }
     private function TraerID($args) {
-        $usr = $args['codigo'];
-        $codigo = Mesa::obtenerIdMesa($usr);
-        return $codigo;
+        $usr = $args['idMesa'];
+        $idMesa = Mesa::obtenerIdMesa($usr);
+        return $idMesa;
+    }
+    private function TraerUnaMesa($args) {
+        $usr = $args['idMesa'];
+        $mesa = Mesa::obtenerUnaMesa($usr);
+        return $mesa;
     }
     public function TraerTodos($request, $response, $args) {
         $lista = Mesa::obtenerTodos();
@@ -47,13 +54,12 @@ class MesaController extends Mesa implements IApiUsable {
     }
 
     public function ModificarUno($request, $response, $args) {
-        $codigo = $this->TraerID($args);
+        $idMesa = $this->TraerID($args);
         $parametros = $request->getParsedBody();
         $idPersonal = $parametros['idPersonal'];
         $cantComensales = $parametros['cantComensales'];
-        $codigo = $parametros['codigo'];
 
-        Mesa::modificarMesa($codigo->codigo, $idPersonal, $cantComensales, $codigo);
+        Mesa::modificarMesa($idMesa->idMesa, $idPersonal, $cantComensales, $idMesa);
 
         $payload = json_encode(array("mensaje" => "Mesa modificado con exito"));
 
@@ -63,10 +69,10 @@ class MesaController extends Mesa implements IApiUsable {
     }
 
     public function BorrarUno($request, $response, $args) {
-        $codigo = $this->TraerID($args);
-        Mesa::borrarMesa($codigo->codigo);
+        $idMesa = $this->TraerID($args);
+        Mesa::borrarMesa($idMesa->idMesa);
 
-        $payload = json_encode(array("mensaje" => "Mesa borrado con exito"));
+        $payload = json_encode(array("mensaje" => "Mesa borrada con exito"));
 
         $response->getBody()->write($payload);
         return $response

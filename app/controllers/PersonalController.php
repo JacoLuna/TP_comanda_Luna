@@ -9,11 +9,15 @@ class PersonalController extends Personal implements IApiUsable {
         $nombre = $parametros['nombre'];
         $apellido = $parametros['apellido'];
         $fechaIngreso = $parametros['fechaIngreso'];
+        $DNI = $parametros['DNI'];
+        $rol = $parametros['rol'];
 
         $usr = new Personal();
         $usr->nombre = $nombre;
         $usr->apellido = $apellido;
         $usr->fechaIngreso = $fechaIngreso;
+        $usr->DNI = $DNI;
+        $usr->rol = $rol;
         $usr->crearPersonal();
 
         $payload = json_encode(array("mensaje" => "Personal creado con exito"));
@@ -33,10 +37,15 @@ class PersonalController extends Personal implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-    private function TraerID($args) {
+    // private function TraerID($args) {
+    //     $usr = $args['DNI'];
+    //     $id = Personal::obtenerIdPersonal($usr);
+    //     return $id;
+    // }    
+    private function TraerUnEmpleado($args) {
         $usr = $args['DNI'];
-        $id = Personal::obtenerIdPersonal($usr);
-        return $id;
+        $empleado = Personal::obtenerPersonal($usr);
+        return $empleado;
     }
     public function TraerTodos($request, $response, $args) {
         $lista = Personal::obtenerTodos();
@@ -49,14 +58,16 @@ class PersonalController extends Personal implements IApiUsable {
     }
 
     public function ModificarUno($request, $response, $args) {
-        $id = $this->TraerID($args);
+        $empleado = $this->TraerUnEmpleado($args);
         $parametros = $request->getParsedBody();
-        $nombre = $parametros['nombre'];
-        $apellido = $parametros['apellido'];
-        $DNI = $parametros['DNI'];
-        $fechaIngreso = $parametros['fechaIngreso'];
 
-        Personal::modificarPersonal($id->id, $nombre, $apellido, $DNI, $fechaIngreso);
+        $nombre = ($parametros['nombre'] != "")?$parametros['nombre'] : $empleado->nombre ;
+        $apellido = ($parametros['apellido'] != "")?$parametros['apellido'] : $empleado->apellido ;
+        $DNI = ($parametros['DNI'] != "")?$parametros['DNI'] : $empleado->DNI ;
+        $rol = ($parametros['rol'] != "")?$parametros['rol'] : $empleado->rol ;
+        $fechaIngreso = ($parametros['fechaIngreso'] != "")?$parametros['fechaIngreso'] : $empleado->fechaIngreso ;
+
+        Personal::modificarPersonal($empleado->idPersonal, $nombre, $apellido, $DNI, $rol, $fechaIngreso);
 
         $payload = json_encode(array("mensaje" => "Personal modificado con exito"));
 
@@ -66,8 +77,8 @@ class PersonalController extends Personal implements IApiUsable {
     }
 
     public function BorrarUno($request, $response, $args) {
-        $id = $this->TraerID($args);
-        Personal::borrarPersonal($id->id);
+        $empleado = $this->TraerUnEmpleado($args);
+        Personal::borrarPersonal($empleado->idPersonal);
 
         $payload = json_encode(array("mensaje" => "Personal borrado con exito"));
 
