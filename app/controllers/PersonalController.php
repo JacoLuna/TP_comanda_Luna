@@ -8,13 +8,15 @@ class PersonalController extends Personal implements IApiUsable {
 
         $nombre = $parametros['nombre'];
         $apellido = $parametros['apellido'];
-        $fechaIngreso = $parametros['fechaIngreso'];
+        $contrasenia = $parametros['contrasenia'];
         $DNI = $parametros['DNI'];
         $rol = $parametros['rol'];
-
+        $fechaIngreso = $parametros['fechaIngreso'];
+        
         $usr = new Personal();
         $usr->nombre = $nombre;
         $usr->apellido = $apellido;
+        $usr->contrasenia = $contrasenia;
         $usr->fechaIngreso = $fechaIngreso;
         $usr->DNI = $DNI;
         $usr->rol = $rol;

@@ -5,6 +5,7 @@ class Pedido {
     public $idPedido;
     public $idMesa;
     public $estado;
+    public $nombreCliente;
     public static $estadosDisponibles = [
         "pendiente",            //solo mozos y socios pueden settear este estado
         "en preparación",       //solo empleados de cocina, barra y socios pueden settear este estado
@@ -13,11 +14,12 @@ class Pedido {
 
     public function crearPedido() {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedido (idPedido, idMesa, estado) 
-        VALUES (:idPedido, :idMesa, :estado)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedido (idPedido, idMesa, estado, nombreCliente) 
+        VALUES (:idPedido, :idMesa, :estado, :nombreCliente)");
         $consulta->bindValue(':idPedido', $this->generarCodigo(3),PDO::PARAM_STR);
         $consulta->bindValue(':idMesa', $this->idMesa, PDO::PARAM_INT);
-        $consulta->bindValue(':estado', $this->estado, PDO::PARAM_STR);
+        $consulta->bindValue(':estado', Pedido::$estadosDisponibles[1], PDO::PARAM_STR);
+        $consulta->bindValue(':nombreCliente', $this->nombreCliente, PDO::PARAM_STR);
         $consulta->execute();
 
         return $objAccesoDatos->obtenerUltimoId();
@@ -86,20 +88,17 @@ class Pedido {
             $consulta->execute();
             return $consulta->fetchObject('Pedido');
     }
-    public static function modificarPedido($idPedido, $estado) {
+    public static function modificarPedido($idPedido, $estado = "", $nombreCliente = "") {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE pedido
-                                                      SET estado = '{$estado}'
-                                                      WHERE idPedido = '{$idPedido}'");
-        $consulta->execute();
-    }
-
-    public static function terminarPedido($idPedido) {
-        $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta(
-            "UPDATE pedido 
-             SET estado = 'cerrado' 
-             WHERE idPedido = {$idPedido}");
+        if($estado == ""){
+            $consulta = $objAccesoDato->prepararConsulta("UPDATE pedido
+                                                          SET nombreCliente = '{$nombreCliente}'
+                                                          WHERE idPedido = '{$idPedido}'");
+        }else{
+            $consulta = $objAccesoDato->prepararConsulta("UPDATE pedido
+                                                          SET estado = '{$estado}'
+                                                          WHERE idPedido = '{$idPedido}'");
+        }
         $consulta->execute();
     }
 
@@ -121,5 +120,12 @@ class Pedido {
         }while($resultado['cont'] != 0);
 
         return $codigo;
+    }
+
+    public static function borrarMesa($idPedido) {
+        // $objAccesoDato = AccesoDatos::obtenerInstancia();
+        // $consulta = $objAccesoDato->prepararConsulta("UPDATE pedido SET rota = :rota WHERE idPedido = '{$idPedido}'");
+        // $consulta->bindValue(':rota', true);
+        // $consulta->execute();
     }
 }

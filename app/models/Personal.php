@@ -4,6 +4,7 @@ class Personal {
     public $idPersonal;
     public $nombre;
     public $apellido;
+    public $contrasenia;
     public $DNI;
     public $rol;
     public $fechaIngreso;
@@ -11,14 +12,15 @@ class Personal {
 
     public function crearPersonal() {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO personal (idPersonal, nombre, apellido, DNI, rol, fechaIngreso, fechaBaja) 
-        VALUES (:idPersonal, :nombre, :apellido, :DNI, :rol, :fechaIngreso, :fechaBaja)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO personal (idPersonal, nombre, apellido, contrasenia, DNI, rol, fechaIngreso, fechaBaja) 
+        VALUES (:idPersonal, :nombre, :apellido, :contrasenia, :DNI, :rol, :fechaIngreso, :fechaBaja)");
         // $consulta->bindValue(':idPersonal', $this->idPersonal, PDO::PARAM_STR);
         //tanto 0 como '' es valido para autoincrement
         // $consulta->bindValue(':idPersonal', 0,PDO::PARAM_STR);
         $consulta->bindValue(':idPersonal', '', PDO::PARAM_INT);
         $consulta->bindValue(':nombre', $this->nombre, PDO::PARAM_STR);
         $consulta->bindValue(':apellido', $this->apellido, PDO::PARAM_STR);
+        $consulta->bindValue(':contrasenia', $this->contrasenia, PDO::PARAM_STR);
         $consulta->bindValue(':DNI', $this->DNI, PDO::PARAM_INT);
         $consulta->bindValue(':rol', $this->rol, PDO::PARAM_STR);
         $consulta->bindValue(':fechaIngreso', $this->fechaIngreso, PDO::PARAM_STR);

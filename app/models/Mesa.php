@@ -43,9 +43,8 @@ class Mesa {
     }
     
     public static function obtenerUnaMesa($idMesa) {
-        
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT idMesa, idPersonal as 'mozo', cantComensales 
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT *
                                                        FROM mesa
                                                        WHERE idMesa = {$idMesa}");
         $consulta->execute();
@@ -56,18 +55,23 @@ class Mesa {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT idMesa
                                                        FROM mesa 
-                                                       WHERE idMesa = :idMesa");
-        $consulta->bindValue(':idMesa', $idMesa, PDO::PARAM_STR);
+                                                       WHERE idMesa = {$idMesa}");
         $consulta->execute();
         return $consulta->fetchObject('Mesa');
     }
     
-    public static function modificarMesa($idMesa, $idPersonal, $cantComensales) {
+    public static function modificarMesa($idMesa, $estado = "", $idPersonal = -1, $cantComensales = -1) {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE mesa
-                                                      SET idPersonal = '{$idPersonal}',
-                                                          cantComensales = {$cantComensales}
-                                                      WHERE idMesa = {$idMesa}");
+        if($estado == ""){
+            $consulta = $objAccesoDato->prepararConsulta("UPDATE mesa
+                                                          SET idPersonal = '{$idPersonal}',
+                                                            cantComensales = {$cantComensales}
+                                                          WHERE idMesa = {$idMesa}");
+        }else{
+            $consulta = $objAccesoDato->prepararConsulta("UPDATE mesa
+                                                        SET estado = '{$estado}'
+                                                        WHERE idMesa = {$idMesa}");
+        }
         $consulta->execute();
     }
 

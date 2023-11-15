@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-11-2023 a las 00:28:36
+-- Tiempo de generación: 15-11-2023 a las 19:52:39
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.2.4
 
@@ -40,10 +40,7 @@ CREATE TABLE `mesa` (
 --
 
 INSERT INTO `mesa` (`IdMesa`, `idPersonal`, `cantComensales`, `rota`, `estado`) VALUES
-(1, 2, 1, 0, 'cerrada'),
-(2, 1, 2, 1, 'con cliente esperando pedido'),
-(3, 1, 3, 0, 'con cliente esperando pedido'),
-(4, 2, 1, 0, 'cerrada');
+(10000, 1, 0, 0, 'cerrada');
 
 -- --------------------------------------------------------
 
@@ -54,7 +51,8 @@ INSERT INTO `mesa` (`IdMesa`, `idPersonal`, `cantComensales`, `rota`, `estado`) 
 CREATE TABLE `pedido` (
   `idPedido` varchar(255) NOT NULL,
   `estado` varchar(255) NOT NULL,
-  `idMesa` int(255) NOT NULL
+  `idMesa` int(255) NOT NULL,
+  `nombreCliente` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -67,6 +65,7 @@ CREATE TABLE `personal` (
   `idPersonal` int(3) NOT NULL,
   `nombre` text NOT NULL,
   `apellido` text NOT NULL,
+  `contrasenia` varchar(255) NOT NULL,
   `DNI` int(8) NOT NULL,
   `rol` varchar(255) NOT NULL,
   `fechaIngreso` date NOT NULL DEFAULT current_timestamp(),
@@ -77,17 +76,16 @@ CREATE TABLE `personal` (
 -- Volcado de datos para la tabla `personal`
 --
 
-INSERT INTO `personal` (`idPersonal`, `nombre`, `apellido`, `DNI`, `rol`, `fechaIngreso`, `fechaBaja`) VALUES
-(1, '', '', -1, '', '0000-00-00', '0000-00-00'),
-(2, 'esteban', 'perex', 44628819, '', '2023-11-03', NULL),
-(3, 'jorge', 'perex', 33228819, '', '2023-11-03', NULL),
-(4, 'jon', 'juan', 23628812, '', '0000-00-00', NULL),
-(5, 'roberto', 'juarez', 44627819, '', '2015-05-15', NULL),
-(6, 'jonh', 'salchijonh', 43622819, '', '2021-12-12', NULL),
-(7, 'jonh', 'juan', 34628819, '', '2021-12-12', NULL),
-(8, 'jorge', 'perex', 33288119, '', '2023-11-03', NULL),
-(9, '', '', 0, '', '2023-11-11', NULL),
-(10, 'robert', 'calamar', 23628819, 'socio', '0000-00-00', NULL);
+INSERT INTO `personal` (`idPersonal`, `nombre`, `apellido`, `contrasenia`, `DNI`, `rol`, `fechaIngreso`, `fechaBaja`) VALUES
+(1, 'nadie', 'nadie', '', -1, 'mozo', '0000-00-00', NULL),
+(2, 'esteban', 'perex', '', 44628819, '', '2023-11-03', NULL),
+(3, 'jorge', 'perex', '', 33228819, '', '2023-11-03', NULL),
+(4, 'jon', 'juan', '', 23628812, '', '0000-00-00', NULL),
+(5, 'roberto', 'juarez', '', 44627819, '', '2015-05-15', NULL),
+(6, 'jonh', 'salchijonh', '', 43622819, '', '2021-12-12', NULL),
+(7, 'jonh', 'juan', '', 34628819, '', '2021-12-12', NULL),
+(8, 'jorge', 'perex', '', 33288119, '', '2023-11-03', NULL),
+(10, 'robert', 'calamar', '', 23628819, 'socio', '0000-00-00', NULL);
 
 -- --------------------------------------------------------
 
@@ -103,14 +101,6 @@ CREATE TABLE `producto` (
   `baja` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `producto`
---
-
-INSERT INTO `producto` (`idProducto`, `nombre`, `tiempoPreparacion`, `zona`, `baja`) VALUES
-(1, 'super pancho', 10, 'cocina', 0),
-(2, 'coca', 1, 'cocina', 0);
-
 -- --------------------------------------------------------
 
 --
@@ -121,6 +111,7 @@ CREATE TABLE `productopedido` (
   `idProductoPedido` int(255) NOT NULL,
   `idProducto` int(255) NOT NULL,
   `idPedido` varchar(255) NOT NULL,
+  `cant` int(255) NOT NULL,
   `tiempoPreparacion` int(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -170,7 +161,7 @@ ALTER TABLE `productopedido`
 -- AUTO_INCREMENT de la tabla `mesa`
 --
 ALTER TABLE `mesa`
-  MODIFY `IdMesa` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `IdMesa` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10002;
 
 --
 -- AUTO_INCREMENT de la tabla `personal`
@@ -182,13 +173,13 @@ ALTER TABLE `personal`
 -- AUTO_INCREMENT de la tabla `producto`
 --
 ALTER TABLE `producto`
-  MODIFY `idProducto` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `idProducto` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `productopedido`
 --
 ALTER TABLE `productopedido`
-  MODIFY `idProductoPedido` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `idProductoPedido` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- Restricciones para tablas volcadas

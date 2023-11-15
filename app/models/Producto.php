@@ -40,7 +40,6 @@ class Producto {
     }
 
     public static function obtenerProductoNombre($nombreProducto) {
-
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT * 
                                                        FROM producto 

@@ -5,14 +5,16 @@ class productoPedido {
     public $idProducto;
     public $idPedido;
     public $tiempoPreparacion;
+    public $cant;
 
     public function crearProductoPedido() {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO productoPedido (idProductoPedido, idProducto, idPedido, tiempoPreparacion) 
-        VALUES (:idProductoPedido, :idProducto, :idPedido, :tiempoPreparacion)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO productoPedido (idProductoPedido, idProducto, idPedido, cant, tiempoPreparacion) 
+        VALUES (:idProductoPedido, :idProducto, :idPedido, :cant, :tiempoPreparacion)");
         $consulta->bindValue(':idProductoPedido', '',PDO::PARAM_INT);
         $consulta->bindValue(':idProducto', $this->idProducto, PDO::PARAM_INT);
         $consulta->bindValue(':idPedido', $this->idPedido, PDO::PARAM_INT);
+        $consulta->bindValue(':cant', $this->cant, PDO::PARAM_INT);
         $consulta->bindValue(':tiempoPreparacion', $this->tiempoPreparacion, PDO::PARAM_STR);
         $consulta->execute();
 

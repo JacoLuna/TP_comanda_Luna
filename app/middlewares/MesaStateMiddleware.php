@@ -11,8 +11,9 @@ class MesaStateMiddleware {
         $bodyRequest = $request->getParsedBody();
 
         $permiso = $parametros['permiso'];
-        $estado = $bodyRequest['estado'];
-
+        if(isset($bodyRequest['estado'])){
+            $estado = $bodyRequest['estado'];
+        }
         if ($permiso == 'mozo' && $estado != Mesa::$estadosDisponibles[3] || $permiso == 'socio') {
             $response = $handler->handle($request);
         } else {

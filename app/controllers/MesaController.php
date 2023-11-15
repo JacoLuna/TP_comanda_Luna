@@ -6,12 +6,9 @@ class MesaController extends Mesa implements IApiUsable {
     public function CargarUno($request, $response, $args) {
         $parametros = $request->getParsedBody();
 
-        $idPersonal = $parametros['idPersonal'];
-        $cantComensales = $parametros['cantComensales'];
-
         $usr = new Mesa();
-        $usr->idPersonal = $idPersonal;
-        $usr->cantComensales = $cantComensales;
+        $usr->idPersonal = 1;
+        $usr->cantComensales = 0;
         $usr->rota = false;
         $usr->estado = Mesa::$estadosDisponibles[3];
         $usr->primera = Mesa::esPrimeraTupla();
@@ -53,6 +50,25 @@ class MesaController extends Mesa implements IApiUsable {
     }
 
     public function ModificarUno($request, $response, $args) {
+        $idMesa = $this->TraerID($args);
+        $parametros = $request->getParsedBody();
+        $estado = "";
+        if(isset($parametros["estado"])){
+            $estado = $parametros['estado'];
+            Mesa::modificarMesa($idMesa->idMesa, $estado);
+        }else{
+            $idPersonal = $parametros['idPersonal'];
+            $cantComensales = $parametros['cantComensales'];
+            Mesa::modificarMesa($idMesa->idMesa, $estado, $idPersonal, $cantComensales);
+        }
+        
+        $payload = json_encode(array("mensaje" => "Mesa modificado con exito"));
+        $response->getBody()->write($payload);
+        return $response
+            ->withHeader('Content-Type', 'application/json');
+    }
+
+    public function cambiarEstado($request, $response, $args) {
         $idMesa = $this->TraerID($args);
         $parametros = $request->getParsedBody();
         $idPersonal = $parametros['idPersonal'];
