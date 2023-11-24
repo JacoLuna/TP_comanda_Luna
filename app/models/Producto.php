@@ -1,7 +1,6 @@
 <?php
-
 class Producto {
-    public $idProducto;
+    public $idProducto = -1;
     public $nombre;
     public $tiempoPreparacion;
     public $zona;
@@ -11,7 +10,11 @@ class Producto {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO producto (idProducto, nombre, tiempoPreparacion, zona, baja) 
         VALUES (:idProducto, :nombre, :tiempoPreparacion, :zona, :baja)");
-        $consulta->bindValue(':idProducto', '', PDO::PARAM_INT);
+        if($this->idProducto == -1){
+            $consulta->bindValue(':idProducto', '', PDO::PARAM_INT);
+        }else{
+            $consulta->bindValue(':idProducto', $this->idProducto, PDO::PARAM_INT);
+        }
         $consulta->bindValue(':nombre', $this->nombre, PDO::PARAM_STR);
         $consulta->bindValue(':tiempoPreparacion', $this->tiempoPreparacion, PDO::PARAM_INT);
         $consulta->bindValue(':zona', $this->zona, PDO::PARAM_STR);
@@ -75,5 +78,9 @@ class Producto {
         $consulta = $objAccesoDato->prepararConsulta("UPDATE producto SET baja = :baja WHERE idProducto = {$idProducto}");
         $consulta->bindValue(':baja', true);
         $consulta->execute();
+    }
+
+    public function toStringCSV(){
+        return $this->idProducto . ","  . $this->nombre . "," . $this->tiempoPreparacion . "," . $this->zona . "," . $this->baja . "\n";   
     }
 }

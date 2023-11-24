@@ -22,6 +22,9 @@ $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
 $app->addBodyParsingMiddleware();
 
+// $productos = Utilities::cargarArchivoSCV(Utilities::$rutaProductos);
+// ProductoController::cargarProductos($productos);
+
 $app->get('/', function ($request,  $response) {
   $response->getBody()->write("----------\n|Api HOME|\n ----------");
   return $response;
@@ -80,8 +83,16 @@ $app->group('/producto', function (RouteCollectorProxy $group) {
 
   $group->get('[/]', \ProductoController::class . ':TraerTodos');
   $group->get('/{idPedido}', \ProductoController::class . ':TraerUno');
+
+  $group->get('/archivo/descarga', \ProductoController::class . ':descargarArchivoCsv')
+    ->add(new SocioMiddleware);
+
   $group->post('[/]', \ProductoController::class . ':CargarUno')
     ->add(new SocioMiddleware);
+
+  $group->post('/archivo', \ProductoController::class . ':cargarArchivoCsv')
+    ->add(new SocioMiddleware);
+
   $group->put('/{idPedido}', \ProductoController::class . ':ModificarUno')
     ->add(new PedidoStateMiddleware());
   $group->delete('/{idPedido}', \ProductoController::class . ':BorrarUno')

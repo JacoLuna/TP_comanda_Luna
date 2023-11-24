@@ -1,5 +1,8 @@
 <?php
 class Utilities {
+
+    static $rutaProductos = "./files/productos.csv";
+
     static function generateRandomString($length = 1) {
         $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);

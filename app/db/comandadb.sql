@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 15-11-2023 a las 19:52:39
+-- Tiempo de generación: 19-11-2023 a las 15:56:30
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.2.4
 
@@ -40,7 +40,7 @@ CREATE TABLE `mesa` (
 --
 
 INSERT INTO `mesa` (`IdMesa`, `idPersonal`, `cantComensales`, `rota`, `estado`) VALUES
-(10000, 1, 0, 0, 'cerrada');
+(10000, 3, 5, 0, 'con cliente comiendo');
 
 -- --------------------------------------------------------
 
@@ -54,6 +54,41 @@ CREATE TABLE `pedido` (
   `idMesa` int(255) NOT NULL,
   `nombreCliente` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `pedido`
+--
+
+INSERT INTO `pedido` (`idPedido`, `estado`, `idMesa`, `nombreCliente`) VALUES
+('04vbP', 'en preparación', 10000, 'roberto'),
+('06fiC', 'en preparación', 10000, 'roberto'),
+('06Mqy', 'en preparación', 10000, 'roberto'),
+('11KcB', 'en preparación', 10000, 'roberto'),
+('21lGO', 'en preparación', 10000, 'roberto'),
+('29NMz', 'en preparación', 10000, 'roberto'),
+('29pVu', 'en preparación', 10000, 'roberto'),
+('31Ltf', 'en preparación', 10000, 'roberto'),
+('31pNx', 'en preparación', 10000, 'roberto'),
+('36yPm', 'en preparación', 10000, 'roberto'),
+('37Sgx', 'en preparación', 10000, 'roberto'),
+('39gtK', 'en preparación', 10000, 'roberto'),
+('44ssu', 'en preparación', 10000, 'roberto'),
+('45mCK', 'en preparación', 10000, 'roberto'),
+('50yhL', 'en preparación', 10000, 'roberto'),
+('51oju', 'en preparación', 10000, 'roberto'),
+('51TQE', 'en preparación', 10000, 'roberto'),
+('58pSz', 'en preparación', 10000, 'roberto'),
+('62khP', 'en preparación', 10000, 'roberto'),
+('71Nxd', 'en preparación', 10000, 'roberto'),
+('72qWl', 'en preparación', 10000, 'roberto'),
+('72UQF', 'en preparación', 10000, 'roberto'),
+('73JRs', 'en preparación', 10000, 'roberto'),
+('75Njr', 'en preparación', 10000, 'roberto'),
+('76Psp', 'en preparación', 10000, 'roberto'),
+('87ExI', 'en preparación', 10000, 'roberto'),
+('87SVX', 'en preparación', 10000, 'roberto'),
+('95ROJ', 'en preparación', 10000, 'roberto'),
+('98MHN', 'en preparación', 10000, 'roberto');
 
 -- --------------------------------------------------------
 
@@ -101,6 +136,14 @@ CREATE TABLE `producto` (
   `baja` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Volcado de datos para la tabla `producto`
+--
+
+-- INSERT INTO `producto` (`idProducto`, `nombre`, `tiempoPreparacion`, `zona`, `baja`) VALUES
+-- (4, 'coca', 1, 'cocina', 0),
+-- (5, 'super pancho', 5, 'cocina', 0);
+
 -- --------------------------------------------------------
 
 --
@@ -114,6 +157,14 @@ CREATE TABLE `productopedido` (
   `cant` int(255) NOT NULL,
   `tiempoPreparacion` int(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `productopedido`
+--
+
+INSERT INTO `productopedido` (`idProductoPedido`, `idProducto`, `idPedido`, `cant`, `tiempoPreparacion`) VALUES
+(38, 5, '98MHN', 3, 5),
+(39, 4, '98MHN', 3, 1);
 
 --
 -- Índices para tablas volcadas
@@ -173,13 +224,13 @@ ALTER TABLE `personal`
 -- AUTO_INCREMENT de la tabla `producto`
 --
 ALTER TABLE `producto`
-  MODIFY `idProducto` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `idProducto` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `productopedido`
 --
 ALTER TABLE `productopedido`
-  MODIFY `idProductoPedido` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `idProductoPedido` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- Restricciones para tablas volcadas
