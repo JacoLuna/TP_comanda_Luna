@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 19-11-2023 a las 15:56:30
+-- Tiempo de generación: 24-11-2023 a las 18:07:13
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.2.4
 
@@ -60,35 +60,11 @@ CREATE TABLE `pedido` (
 --
 
 INSERT INTO `pedido` (`idPedido`, `estado`, `idMesa`, `nombreCliente`) VALUES
-('04vbP', 'en preparación', 10000, 'roberto'),
-('06fiC', 'en preparación', 10000, 'roberto'),
-('06Mqy', 'en preparación', 10000, 'roberto'),
-('11KcB', 'en preparación', 10000, 'roberto'),
-('21lGO', 'en preparación', 10000, 'roberto'),
-('29NMz', 'en preparación', 10000, 'roberto'),
-('29pVu', 'en preparación', 10000, 'roberto'),
-('31Ltf', 'en preparación', 10000, 'roberto'),
-('31pNx', 'en preparación', 10000, 'roberto'),
-('36yPm', 'en preparación', 10000, 'roberto'),
-('37Sgx', 'en preparación', 10000, 'roberto'),
-('39gtK', 'en preparación', 10000, 'roberto'),
-('44ssu', 'en preparación', 10000, 'roberto'),
-('45mCK', 'en preparación', 10000, 'roberto'),
-('50yhL', 'en preparación', 10000, 'roberto'),
-('51oju', 'en preparación', 10000, 'roberto'),
-('51TQE', 'en preparación', 10000, 'roberto'),
-('58pSz', 'en preparación', 10000, 'roberto'),
-('62khP', 'en preparación', 10000, 'roberto'),
-('71Nxd', 'en preparación', 10000, 'roberto'),
-('72qWl', 'en preparación', 10000, 'roberto'),
-('72UQF', 'en preparación', 10000, 'roberto'),
-('73JRs', 'en preparación', 10000, 'roberto'),
-('75Njr', 'en preparación', 10000, 'roberto'),
-('76Psp', 'en preparación', 10000, 'roberto'),
+('47KSz', 'en preparación', 10000, 'roberto'),
 ('87ExI', 'en preparación', 10000, 'roberto'),
 ('87SVX', 'en preparación', 10000, 'roberto'),
 ('95ROJ', 'en preparación', 10000, 'roberto'),
-('98MHN', 'en preparación', 10000, 'roberto');
+('98MHN', 'pendiente', 10000, 'roberto');
 
 -- --------------------------------------------------------
 
@@ -112,15 +88,16 @@ CREATE TABLE `personal` (
 --
 
 INSERT INTO `personal` (`idPersonal`, `nombre`, `apellido`, `contrasenia`, `DNI`, `rol`, `fechaIngreso`, `fechaBaja`) VALUES
-(1, 'nadie', 'nadie', '', -1, 'mozo', '0000-00-00', NULL),
-(2, 'esteban', 'perex', '', 44628819, '', '2023-11-03', NULL),
-(3, 'jorge', 'perex', '', 33228819, '', '2023-11-03', NULL),
-(4, 'jon', 'juan', '', 23628812, '', '0000-00-00', NULL),
-(5, 'roberto', 'juarez', '', 44627819, '', '2015-05-15', NULL),
-(6, 'jonh', 'salchijonh', '', 43622819, '', '2021-12-12', NULL),
-(7, 'jonh', 'juan', '', 34628819, '', '2021-12-12', NULL),
-(8, 'jorge', 'perex', '', 33288119, '', '2023-11-03', NULL),
-(10, 'robert', 'calamar', '', 23628819, 'socio', '0000-00-00', NULL);
+(1, 'nadie', 'nadie', '', -1, '-1', '0000-00-00', NULL),
+(2, 'esteban', 'perex', '1234', 44628819, 'bartender-tragos', '2023-11-03', NULL),
+(3, 'jorge', 'perex', '5678', 33228819, 'cocinero-postres', '2023-11-03', NULL),
+(4, 'jon', 'juan', 'serCocineroEstabueno', 23628812, 'cocinero-comida', '2015-11-11', NULL),
+(5, 'roberto', 'juarez', '987654321', 44627819, 'mozo', '2015-05-15', NULL),
+(6, 'jonh', 'jonh', 'salchijonh', 43622819, 'socio', '2021-12-12', NULL),
+(7, 'jonh', 'juan', 'wachinFacha', 34628819, 'bartender-bebidas', '2021-12-12', NULL),
+(8, 'jorge', 'perex', 'perex12345667', 33288119, 'mozo', '2023-11-03', NULL),
+(10, 'robert', 'calamar', 'qazwsxedcrfv', 23628819, 'socio', '0000-00-00', NULL),
+(11, 'franco', 'fracovich', '1234', 23628811, 'mozo', '0000-00-00', NULL);
 
 -- --------------------------------------------------------
 
@@ -140,9 +117,14 @@ CREATE TABLE `producto` (
 -- Volcado de datos para la tabla `producto`
 --
 
--- INSERT INTO `producto` (`idProducto`, `nombre`, `tiempoPreparacion`, `zona`, `baja`) VALUES
--- (4, 'coca', 1, 'cocina', 0),
--- (5, 'super pancho', 5, 'cocina', 0);
+INSERT INTO `producto` (`idProducto`, `nombre`, `tiempoPreparacion`, `zona`, `baja`) VALUES
+(4, 'coca', 1, 'cocina', 0),
+(5, 'super pancho', 10, 'cocina', 0),
+(20, 'milanesa', 40, 'cocina', 0),
+(29, 'milanesa a caballo', 40, 'cocina', 0),
+(37, 'hamburguesa de garbanzo', 30, 'cocina', 0),
+(38, 'corona', 5, 'barra de choperas', 0),
+(39, 'daikiri', 8, 'barra de tragos y vinos', 0);
 
 -- --------------------------------------------------------
 
@@ -163,8 +145,10 @@ CREATE TABLE `productopedido` (
 --
 
 INSERT INTO `productopedido` (`idProductoPedido`, `idProducto`, `idPedido`, `cant`, `tiempoPreparacion`) VALUES
-(38, 5, '98MHN', 3, 5),
-(39, 4, '98MHN', 3, 1);
+(40, 29, '98MHN', 1, 40),
+(41, 37, '98MHN', 2, 30),
+(42, 38, '98MHN', 1, 5),
+(43, 39, '98MHN', 1, 8);
 
 --
 -- Índices para tablas volcadas
@@ -218,19 +202,19 @@ ALTER TABLE `mesa`
 -- AUTO_INCREMENT de la tabla `personal`
 --
 ALTER TABLE `personal`
-  MODIFY `idPersonal` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `idPersonal` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de la tabla `producto`
 --
 ALTER TABLE `producto`
-  MODIFY `idProducto` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `idProducto` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT de la tabla `productopedido`
 --
 ALTER TABLE `productopedido`
-  MODIFY `idProductoPedido` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `idProductoPedido` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- Restricciones para tablas volcadas

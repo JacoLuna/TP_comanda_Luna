@@ -8,20 +8,21 @@ class PedidoStateMiddleware {
 
     public function __invoke(Request $request, RequestHandler $handler): Response {
         $permisoValido = false;
-        $parametros = $request->getQueryParams();
         $bodyRequest = $request->getParsedBody();
-
-        $permiso = $parametros['permiso'];
+        $data = AutentificadorJWT::ObtenerDataWithHeader($request->getHeaderLine('Authorization'));
+        
         $estado = $bodyRequest['estado'];
 
-        switch ($permiso) {
+        switch ($data->rol) {
             case "mozo":
                 if($estado == Pedido::$estadosDisponibles[0] || $estado == Pedido::$estadosDisponibles[3]){
                     $permisoValido = true;
                 }
                 break;
-            case "bartender":
-            case "cocinero":
+            case "bartender-tragos":
+            case "bartender-bebidas":
+            case "cocinero-postres":
+            case "cocinero-comida":
                 if($estado == Pedido::$estadosDisponibles[1] || $estado == Pedido::$estadosDisponibles[2]){
                     $permisoValido = true;
                 }

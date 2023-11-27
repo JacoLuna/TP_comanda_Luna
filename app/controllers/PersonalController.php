@@ -8,7 +8,7 @@ class PersonalController extends Personal implements IApiUsable {
 
         $nombre = $parametros['nombre'];
         $apellido = $parametros['apellido'];
-        $contrasenia = $parametros['contrasenia'];
+        $contrasenia = $parametros['clave'];
         $DNI = $parametros['DNI'];
         $rol = $parametros['rol'];
         $fechaIngreso = $parametros['fechaIngreso'];
@@ -28,7 +28,22 @@ class PersonalController extends Personal implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
+    public function logIn($request, $response, $args){
+        $parametros = $request->getParsedBody(); 
+        $nombre = $parametros['nombre'];
+        $contrasenia = $parametros['clave'];
+        $empleado = Personal::acceso($nombre, $contrasenia);
+        if($empleado){
+            $token = AutentificadorJWT::CrearToken($empleado->nombre, $empleado->DNI, $empleado->rol);
+            $payload = json_encode(array('mensaje' => 'se ingresó con exito',
+                                         'jwt' => $token));
+        }else{
+            $payload = json_encode(array('error' => 'Usuario o contraseña incorrectos'));
+        }
+        $response->getBody()->write($payload);
+        return $response
+            ->withHeader('Content-Type', 'application/json');
+    }
     public function TraerUno($request, $response, $args) {
         // Buscamos personal por DNI
         $usr = $args['DNI'];
@@ -39,11 +54,6 @@ class PersonalController extends Personal implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-    // private function TraerID($args) {
-    //     $usr = $args['DNI'];
-    //     $id = Personal::obtenerIdPersonal($usr);
-    //     return $id;
-    // }    
     private function TraerUnEmpleado($args) {
         $usr = $args['DNI'];
         $empleado = Personal::obtenerPersonal($usr);
@@ -58,7 +68,6 @@ class PersonalController extends Personal implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
     public function ModificarUno($request, $response, $args) {
         $empleado = $this->TraerUnEmpleado($args);
         $parametros = $request->getParsedBody();
@@ -77,7 +86,6 @@ class PersonalController extends Personal implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
     public function BorrarUno($request, $response, $args) {
         $empleado = $this->TraerUnEmpleado($args);
         Personal::borrarPersonal($empleado->idPersonal);

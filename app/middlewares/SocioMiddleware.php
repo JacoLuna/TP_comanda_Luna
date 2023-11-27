@@ -7,13 +7,14 @@ use Slim\Psr7\Response;
     class SocioMiddleware{
         
         public function __invoke(Request $request, RequestHandler $handler): Response{
-            $parametros = $request->getQueryParams();
-            $permiso = $parametros['permiso'];
-            if ($permiso == 'socio') {
+            
+            $data = AutentificadorJWT::ObtenerDataWithHeader($request->getHeaderLine('Authorization'));
+            
+            if ($data->rol == 'socio') {
                 $response = $handler->handle($request);
             } else {
                 $response = new Response();
-                $payload = json_encode(array('mensaje' => 'Solo los socios pueden ejecutar esta accion'));
+                $payload = json_encode(array('ERROR' => 'Solo los socios pueden ejecutar esta accion'));
                 $response->getBody()->write($payload);
             }
     

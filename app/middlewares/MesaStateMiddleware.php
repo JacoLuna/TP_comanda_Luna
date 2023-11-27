@@ -10,16 +10,17 @@ class MesaStateMiddleware {
         $parametros = $request->getQueryParams();
         $bodyRequest = $request->getParsedBody();
 
-        $permiso = $parametros['permiso'];
+        $data = AutentificadorJWT::ObtenerDataWithHeader($request->getHeaderLine('Authorization'));
+
         if(isset($bodyRequest['estado'])){
             $estado = $bodyRequest['estado'];
         }
-        if ($permiso == 'mozo' && $estado != Mesa::$estadosDisponibles[3] || $permiso == 'socio') {
+        if ($data->rol == 'mozo' && $estado != Mesa::$estadosDisponibles[3] || $data->rol == 'socio') {
             $response = $handler->handle($request);
         } else {
             $response = new Response();
             $mensaje = 'ERROR';
-            if($permiso == 'mozo' && $estado == Mesa::$estadosDisponibles[3]) {
+            if($data->rol == 'mozo' && $estado == Mesa::$estadosDisponibles[3]) {
                 $mensaje .= ' solo los socios pueden cerrar una mesa';
             }else{
                 $mensaje .= ' no tiene el permiso valido para ejecutar esta accion';

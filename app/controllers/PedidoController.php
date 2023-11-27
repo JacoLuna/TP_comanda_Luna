@@ -23,16 +23,16 @@ class PedidoController extends Pedido implements IApiUsable {
             $productoPedido->idProducto = $prodActual->idProducto;
             $productoPedido->idPedido = $idPedido->ultimoId;
             $productoPedido->cant =  $producto['cantidad'];
-            $productoPedido->tiempoPreparacion =  $prodActual->tiempoPreparacion;
+            $productoPedido->tiempoPreparacion =  $prodActual->tiempoPreparacion * $producto['cantidad'];
             $productoPedido->crearProductoPedido();
         }
 
-        // if (!$_FILES["imagen"]["error"]) {
-        //     $partesRuta = explode(".", $_FILES["imagen"]["name"]);
-        //     $extension = end($partesRuta);
-        //     $destino = "img/" . $idPedido->ultimoId . "-" . $usr->idMesa . '.' . $extension;
-        //     move_uploaded_file($_FILES["imagen"]["tmp_name"], $destino);
-        // }
+        if (!$_FILES["imagen"]["error"]) {
+            $partesRuta = explode(".", $_FILES["imagen"]["name"]);
+            $extension = end($partesRuta);
+            $destino = "img/" . $idPedido->ultimoId . "-" . $usr->idMesa . '.' . $extension;
+            move_uploaded_file($_FILES["imagen"]["tmp_name"], $destino);
+        }
 
         $payload = json_encode(array("mensaje" => "Pedido creado con exito, su codigo es " . $idPedido->ultimoId));
         $response->getBody()->write($payload);
@@ -42,12 +42,12 @@ class PedidoController extends Pedido implements IApiUsable {
     }
 
     public function TraerUno($request, $response, $args) {
-        // Buscamos pedido por id
         $usr = $args['idPedido'];
+        $data = AutentificadorJWT::ObtenerDataWithHeader($request->getHeaderLine('Authorization'));
+
+        $pedidoProductos = Pedido::obtenerProdcutosDelPedido($usr, $data->rol);
         
-        $pedidoPrductos = Pedido::obtenerProdcutosDelPedido($usr);
-        
-        $payload = json_encode($pedidoPrductos);
+        $payload = json_encode($pedidoProductos);
 
         $response->getBody()->write($payload);
         return $response
@@ -72,7 +72,7 @@ class PedidoController extends Pedido implements IApiUsable {
         $parametros = $request->getParsedBody();
         $idPedido = $args['idPedido'];
         $estado = "";
-
+        
         $payload = json_encode(array("mensaje" => "Hubo un error al modificar el pedido"));
 
         if(isset($parametros['estado'])){
@@ -93,7 +93,19 @@ class PedidoController extends Pedido implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
+    public function TiempoDemora($request, $response, $args){
+        $parametros = $request->getParsedBody();
+        $idPedido = $args['idPedido'];
+        $idMesa = $args['idMesa'];
+        
+        $lista = Pedido::demora($idPedido, $idMesa);
+        $payload = json_encode(array("tiempo de demora" => $lista));
 
+        $response->getBody()->write($payload);
+
+        return $response
+            ->withHeader('Content-Type', 'application/json');
+    }
 //CONTROLAR
     public function BorrarUno($request, $response, $args) {
         // $id = $this->TraerID($args);

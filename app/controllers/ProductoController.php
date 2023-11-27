@@ -27,22 +27,75 @@ class ProductoController extends Producto implements IApiUsable {
             ->withHeader('Content-Type', 'application/json');
     }
 
-    static function cargarProductos($productos) {
-        $prodStr = "";
-        if ($productos != null) {
-            for ($i = 0; $i < count($productos); $i++) {
-                for ($j = 0; $j < count($productos[$i]); $j++) {
+    // static function cargarProductos($productos) {
+    //     $prodStr = "";
+    //     if ($productos != null) {
+    //         for ($i = 0; $i < count($productos); $i++) {
+    //             for ($j = 0; $j < count($productos[$i]); $j++) {
 
-                    if ($j == count($productos[$i]) - 1) {
-                        $prodStr .= $productos[$i][$j];
-                    } else {
-                        $prodStr .= $productos[$i][$j] . ",";
-                    }
-                }
-                array_push(self::$productosStr, $prodStr);
-                $prodStr = "";
-            }
-        }
+    //                 if ($j == count($productos[$i]) - 1) {
+    //                     $prodStr .= $productos[$i][$j];
+    //                 } else {
+    //                     $prodStr .= $productos[$i][$j] . ",";
+    //                 }
+    //             }
+    //             array_push(self::$productosStr, $prodStr);
+    //             $prodStr = "";
+    //         }
+    //     }
+    // }
+
+    public function TraerUno($request, $response, $args) {
+        $usr = $args['idProducto'];
+        $producto = Producto::obtenerProducto($usr);
+        $payload = json_encode($producto);
+
+        $response->getBody()->write($payload);
+        return $response
+            ->withHeader('Content-Type', 'application/json');
+    }
+
+    private function TraerID($args) {
+        $usr = $args['idProducto'];
+        $codigo = Producto::obtenerIdProducto($usr);
+        return $codigo;
+    }
+
+    public function TraerTodos($request, $response, $args) {
+        $lista = Producto::obtenerTodos();
+        $payload = json_encode(array("listaProducto" => $lista), JSON_PRETTY_PRINT);
+
+        $response->getBody()->write($payload);
+
+        return $response
+            ->withHeader('Content-Type', 'application/json');
+    }
+    //CONTROLAR
+    public function ModificarUno($request, $response, $args) {
+        $idPersonal = $this->TraerID($args);
+        $parametros = $request->getParsedBody();
+        $nombre = $parametros['nombre'];
+        $tiempoPreparacion = $parametros['tiempoPreparacion'];
+        $zona = $parametros['zona'];
+
+        Producto::modificarProducto($idPersonal->idPersonal, $nombre, $tiempoPreparacion, $zona);
+
+        $payload = json_encode(array("mensaje" => "Producto modificado con exito"));
+
+        $response->getBody()->write($payload);
+        return $response
+            ->withHeader('Content-Type', 'application/json');
+    }
+
+    public function BorrarUno($request, $response, $args) {
+        $idPersonal = $this->TraerID($args);
+        Producto::borrarProducto($idPersonal->idPersonal);
+
+        $payload = json_encode(array("mensaje" => "Producto borrado con exito"));
+
+        $response->getBody()->write($payload);
+        return $response
+            ->withHeader('Content-Type', 'application/json');
     }
 
     public function cargarArchivoCsv($request, $response, $args) {
@@ -147,58 +200,5 @@ class ProductoController extends Producto implements IApiUsable {
         }
         fwrite($archivo, $rows);
         fclose($archivo);
-    }
-
-    public function TraerUno($request, $response, $args) {
-        $usr = $args['idProducto'];
-        $producto = Producto::obtenerProducto($usr);
-        $payload = json_encode($producto);
-
-        $response->getBody()->write($payload);
-        return $response
-            ->withHeader('Content-Type', 'application/json');
-    }
-
-    private function TraerID($args) {
-        $usr = $args['idProducto'];
-        $codigo = Producto::obtenerIdProducto($usr);
-        return $codigo;
-    }
-
-    public function TraerTodos($request, $response, $args) {
-        $lista = Producto::obtenerTodos();
-        $payload = json_encode(array("listaProducto" => $lista), JSON_PRETTY_PRINT);
-
-        $response->getBody()->write($payload);
-
-        return $response
-            ->withHeader('Content-Type', 'application/json');
-    }
-    //CONTROLAR
-    public function ModificarUno($request, $response, $args) {
-        $idPersonal = $this->TraerID($args);
-        $parametros = $request->getParsedBody();
-        $nombre = $parametros['nombre'];
-        $tiempoPreparacion = $parametros['tiempoPreparacion'];
-        $zona = $parametros['zona'];
-
-        Producto::modificarProducto($idPersonal->idPersonal, $nombre, $tiempoPreparacion, $zona);
-
-        $payload = json_encode(array("mensaje" => "Producto modificado con exito"));
-
-        $response->getBody()->write($payload);
-        return $response
-            ->withHeader('Content-Type', 'application/json');
-    }
-
-    public function BorrarUno($request, $response, $args) {
-        $idPersonal = $this->TraerID($args);
-        Producto::borrarProducto($idPersonal->idPersonal);
-
-        $payload = json_encode(array("mensaje" => "Producto borrado con exito"));
-
-        $response->getBody()->write($payload);
-        return $response
-            ->withHeader('Content-Type', 'application/json');
     }
 }

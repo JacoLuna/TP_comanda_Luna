@@ -6,16 +6,24 @@ class productoPedido {
     public $idPedido;
     public $tiempoPreparacion;
     public $cant;
+    public $estado;
+    public static $estadosDisponibles = [
+        "pendiente",            //solo mozos y socios pueden settear este estado
+        "en preparación",       //solo empleados de cocina, barra y socios pueden settear este estado
+        "listo para servir",    //solo empleados de cocina, barra y socios pueden settear este estado
+        "servido"]; 
 
     public function crearProductoPedido() {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO productoPedido (idProductoPedido, idProducto, idPedido, cant, tiempoPreparacion) 
-        VALUES (:idProductoPedido, :idProducto, :idPedido, :cant, :tiempoPreparacion)");
+        $consulta = $objAccesoDatos->prepararConsulta(
+        "INSERT INTO productoPedido (idProductoPedido, idProducto, idPedido, cant, tiempoPreparacion, estado) 
+         VALUES (:idProductoPedido, :idProducto, :idPedido, :cant, :tiempoPreparacion, :estado)");
         $consulta->bindValue(':idProductoPedido', '',PDO::PARAM_INT);
         $consulta->bindValue(':idProducto', $this->idProducto, PDO::PARAM_INT);
         $consulta->bindValue(':idPedido', $this->idPedido, PDO::PARAM_INT);
         $consulta->bindValue(':cant', $this->cant, PDO::PARAM_INT);
         $consulta->bindValue(':tiempoPreparacion', $this->tiempoPreparacion, PDO::PARAM_STR);
+        $consulta->bindValue(':estado', self::$estadosDisponibles[0], PDO::PARAM_STR);
         $consulta->execute();
 
         return $objAccesoDatos->obtenerUltimoId();
@@ -52,12 +60,11 @@ class productoPedido {
 
     public static function modificarProductoPedido($idProductoPedido, $estado) {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE ProductoPedido
-                                                      SET estado = '{$estado}',
+        $consulta = $objAccesoDato->prepararConsulta("UPDATE productoPedido
+                                                      SET estado = '{$estado}'
                                                       WHERE idProductoPedido = {$idProductoPedido}");
         $consulta->execute();
     }
-
     // public static function terminarProductoPedido($idProductoPedido) {
     //     $objAccesoDato = AccesoDatos::obtenerInstancia();
     //     $consulta = $objAccesoDato->prepararConsulta(

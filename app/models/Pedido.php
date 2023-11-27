@@ -18,7 +18,7 @@ class Pedido {
         VALUES (:idPedido, :idMesa, :estado, :nombreCliente)");
         $consulta->bindValue(':idPedido', $this->generarCodigo(3),PDO::PARAM_STR);
         $consulta->bindValue(':idMesa', $this->idMesa, PDO::PARAM_INT);
-        $consulta->bindValue(':estado', Pedido::$estadosDisponibles[1], PDO::PARAM_STR);
+        $consulta->bindValue(':estado', Pedido::$estadosDisponibles[0], PDO::PARAM_STR);
         $consulta->bindValue(':nombreCliente', $this->nombreCliente, PDO::PARAM_STR);
         $consulta->execute();
 
@@ -44,17 +44,48 @@ class Pedido {
         return $consulta->fetchObject('Pedido');
     }
 
-    public static function obtenerProdcutosDelPedido($idPedido) {
-        
+    public static function obtenerProdcutosDelPedido($idPedido, $rol) {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("
-        SELECT ped.idPedido, ped.idMesa, ped.estado , nombre as nombre_del_prodcuto 
-        FROM pedido as ped
-        inner join productopedido as prodPed
-        on ped.idPedido = prodPed.idPedido
-        inner join producto as prod
-        on prodPed.idProducto = prod.idProducto
-        where :idPedido = ped.idPedido");
+        $zona = "";
+        switch($rol){
+            case "bartender-bebidas":
+                $zona = "barra de choperas";
+            break;
+            case "bartender-tragos":
+                $zona = "barra de tragos y vinos";
+            break;
+            case "cocinero-postres":
+                $zona = "Candy Bar";
+            break;
+            case "cocinero-comida":
+                $zona = "cocina";
+            break;
+        }
+
+        if($zona != ""){
+            $consulta = $objAccesoDatos->prepararConsulta("
+            SELECT 
+            ped.idPedido as Pedido , ped.idMesa as Mesa, idProductopedido as Nro_detalle, 
+            ped.estado as estado_pedido, prodped.estado as estado_item, nombre as nombre_del_prodcuto, cant
+            FROM pedido as ped
+            inner join productopedido as prodPed
+            on ped.idPedido = prodPed.idPedido
+            inner join producto as prod
+            on prodPed.idProducto = prod.idProducto
+            where :idPedido = ped.idPedido 
+            and zona = '{$zona}'");
+        }else{
+            $consulta = $objAccesoDatos->prepararConsulta("
+            SELECT 
+            ped.idPedido as Pedido , ped.idMesa as Mesa, idProductopedido as Nro_detalle, 
+            ped.estado , nombre as nombre_del_prodcuto, cant, hecho
+            FROM pedido as ped
+            inner join productopedido as prodPed
+            on ped.idPedido = prodPed.idPedido
+            inner join producto as prod
+            on prodPed.idProducto = prod.idProducto
+            where :idPedido = ped.idPedido");
+        }
 
         $consulta->bindValue(':idPedido', $idPedido, PDO::PARAM_INT);
         $consulta->setFetchMode(PDO::FETCH_ASSOC);
@@ -122,6 +153,19 @@ class Pedido {
         return $codigo;
     }
 
+    public static function demora($idPedido, $idMesa){
+
+    //     $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        
+    //     $consulta = $objAccesoDatos->prepararConsulta("SELECT MAX(tiempoPreparacion) 
+    //                                                    FROM productopedido as prodped
+    //                                                    INNER JOIN pedido as ped
+    //                                                    on prodped.idPedido = ped.idPedido
+    //                                                    WHERE ped.idPedido = '{$idPedido}' 
+    //                                                    and idMesa = {$idMesa}");
+                                                       
+    //     $consulta->execute();
+    }
     public static function borrarMesa($idPedido) {
         // $objAccesoDato = AccesoDatos::obtenerInstancia();
         // $consulta = $objAccesoDato->prepararConsulta("UPDATE pedido SET rota = :rota WHERE idPedido = '{$idPedido}'");

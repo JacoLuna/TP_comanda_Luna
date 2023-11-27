@@ -6,13 +6,14 @@ class Personal {
     public $apellido;
     public $contrasenia;
     public $DNI;
-    public $rol;
+    public $rol; //socio, mozo, cocinero-postres, cocinero-comida, bartender-tragos, bartender-bebidas  
     public $fechaIngreso;
     public $fechaBaja = null;
 
     public function crearPersonal() {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO personal (idPersonal, nombre, apellido, contrasenia, DNI, rol, fechaIngreso, fechaBaja) 
+        $consulta = $objAccesoDatos->prepararConsulta
+        ("INSERT INTO personal (idPersonal, nombre, apellido, contrasenia, DNI, rol, fechaIngreso, fechaBaja) 
         VALUES (:idPersonal, :nombre, :apellido, :contrasenia, :DNI, :rol, :fechaIngreso, :fechaBaja)");
         // $consulta->bindValue(':idPersonal', $this->idPersonal, PDO::PARAM_STR);
         //tanto 0 como '' es valido para autoincrement
@@ -78,6 +79,18 @@ class Personal {
         $fecha = new DateTime();
         $consulta->bindValue(':fechaBaja', date_format($fecha, 'Y-m-d H:i:s'));
         $consulta->execute();
+    }
+
+    public static function acceso($nombre, $clave){
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT *
+                                                       FROM personal 
+                                                       WHERE contrasenia = :clave
+                                                       AND nombre = :nombre");
+        $consulta->bindValue(':nombre', $nombre, PDO::PARAM_STR);
+        $consulta->bindValue(':clave', $clave, PDO::PARAM_STR);
+        $consulta->execute();
+        return $consulta->fetchObject('Personal');
     }
 
     function getValues() {
