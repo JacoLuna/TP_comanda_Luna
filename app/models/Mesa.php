@@ -62,15 +62,28 @@ class Mesa {
     
     public static function modificarMesa($idMesa, $estado = "", $idPersonal = -1, $cantComensales = -1) {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
-        if($estado == ""){
-            $consulta = $objAccesoDato->prepararConsulta("UPDATE mesa
-                                                          SET idPersonal = '{$idPersonal}',
-                                                            cantComensales = {$cantComensales}
-                                                          WHERE idMesa = {$idMesa}");
+        if($estado == "" || $estado == Mesa::$estadosDisponibles[0]){
+            if($idPersonal != -1 && $cantComensales != -1){
+                $consulta = $objAccesoDato->prepararConsulta("UPDATE mesa
+                                                              SET idPersonal = {$idPersonal},
+                                                                  cantComensales = {$cantComensales}
+                                                              WHERE idMesa = {$idMesa}");
+            }else{
+                if($cantComensales != -1){
+                    $consulta = $objAccesoDato->prepararConsulta("UPDATE mesa
+                                                                  SET cantComensales = {$cantComensales}
+                                                                  WHERE idMesa = {$idMesa}");
+                }else{
+                    $consulta = $objAccesoDato->prepararConsulta("UPDATE mesa
+                                                                  SET idPersonal = {$idPersonal}
+                                                                  WHERE idMesa = {$idMesa}");
+
+                }
+            }
         }else{
             $consulta = $objAccesoDato->prepararConsulta("UPDATE mesa
-                                                        SET estado = '{$estado}'
-                                                        WHERE idMesa = {$idMesa}");
+                                                            SET estado = '{$estado}'
+                                                            WHERE idMesa = {$idMesa}");
         }
         $consulta->execute();
     }

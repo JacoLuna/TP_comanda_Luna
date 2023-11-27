@@ -7,14 +7,14 @@ class AutentificadorJWT {
     private static $clave = 'comanda963852741';
     private static $tipoEncriptacion = 'HS256';
 
-    public static function CrearToken($nombre, $DNI, $rol) {
+    public static function CrearToken($nombre, $idPersonal, $rol) {
         $ahora = time();
         $payload = array(
             'iat' => $ahora,
             'exp' => $ahora + (28800000), //8 horas
             'data' => [
                 'nombre' => $nombre,
-                'DNI' => $DNI,
+                'idPersonal' => $idPersonal,
                 'rol' => $rol,
             ],
             'app' => "La comanda"

@@ -34,8 +34,8 @@ class PersonalController extends Personal implements IApiUsable {
         $contrasenia = $parametros['clave'];
         $empleado = Personal::acceso($nombre, $contrasenia);
         if($empleado){
-            $token = AutentificadorJWT::CrearToken($empleado->nombre, $empleado->DNI, $empleado->rol);
-            $payload = json_encode(array('mensaje' => 'se ingresó con exito',
+            $token = AutentificadorJWT::CrearToken($empleado->nombre, $empleado->idPersonal, $empleado->rol);
+            $payload = json_encode(array('mensaje' => 'bienvenido '. $empleado->nombre,
                                          'jwt' => $token));
         }else{
             $payload = json_encode(array('error' => 'Usuario o contraseña incorrectos'));

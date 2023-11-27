@@ -4,14 +4,15 @@ class AccesoDatos {
     private $objetoPDO;
 
     private function __construct() {
-        // try {
-        //     $this->objetoPDO = new PDO('mysql:host='.$_ENV['MYSQL_HOST'].';dbname='.$_ENV['MYSQL_DB'].';charset=utf8', $_ENV['MYSQL_USER'], $_ENV['MYSQL_PASS'], array(PDO::ATTR_EMULATE_PREPARES => false, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
-        //     $this->objetoPDO->exec("SET CHARACTER SET utf8");
-        // } catch (PDOException $e) {
-        //     print "Error: " . $e->getMessage();
-        //     die();
-        // }
         try {
+            $now = new DateTime();
+            $mins = $now->getOffset() / 60;
+            $sgn = ($mins < 0 ? -1 : 1);
+            $mins = abs($mins);
+            $hrs = floor($mins / 60);
+            $mins -= $hrs * 60;
+            $offset = sprintf('%+d:%02d', $hrs*$sgn, $mins);
+
             $this->objetoPDO = new PDO(
                 'mysql:host=localhost; dbname=comandadb; charset=utf8',
                 'root',
@@ -20,6 +21,7 @@ class AccesoDatos {
             );
 
             $this->objetoPDO->exec("SET CHARACTER SET utf8");
+            $this->objetoPDO->exec("SET time_zone='$offset';");
         } catch (PDOException $e) {
             print "Error: " . $e->getMessage();
             die();

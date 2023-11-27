@@ -6,6 +6,7 @@ class Pedido {
     public $idMesa;
     public $estado;
     public $nombreCliente;
+    public $horaHecho;
     public static $estadosDisponibles = [
         "pendiente",            //solo mozos y socios pueden settear este estado
         "en preparación",       //solo empleados de cocina, barra y socios pueden settear este estado
@@ -14,20 +15,27 @@ class Pedido {
 
     public function crearPedido() {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO pedido (idPedido, idMesa, estado, nombreCliente) 
-        VALUES (:idPedido, :idMesa, :estado, :nombreCliente)");
-        $consulta->bindValue(':idPedido', $this->generarCodigo(3),PDO::PARAM_STR);
-        $consulta->bindValue(':idMesa', $this->idMesa, PDO::PARAM_INT);
+        $consulta = $objAccesoDatos->prepararConsulta(
+        "INSERT INTO pedido (idPedido, estado, idMesa, nombreCliente, horaHecho) 
+         VALUES (:idPedido, :estado, :idMesa, :nombreCliente, :horaHecho)");
+        $idPedido = $this->generarCodigo(3);
+        $consulta->bindValue(':idPedido', $idPedido ,PDO::PARAM_STR);
         $consulta->bindValue(':estado', Pedido::$estadosDisponibles[0], PDO::PARAM_STR);
+        $consulta->bindValue(':idMesa', $this->idMesa, PDO::PARAM_INT);
         $consulta->bindValue(':nombreCliente', $this->nombreCliente, PDO::PARAM_STR);
+        $consulta->bindValue(':horaHecho', $this->horaHecho->format("H:i:s"), PDO::PARAM_STR);
         $consulta->execute();
 
-        return $objAccesoDatos->obtenerUltimoId();
+        return $idPedido;
     }
 
-    public static function obtenerTodos() {
+    public static function obtenerTodos($estado = "") {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM pedido");
+        if($estado == ""){
+            $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM pedido");
+        }else{
+            $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM pedido WHERE estado = '{$estado}'");
+        }
         $consulta->execute();
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'Pedido');
     }
@@ -44,7 +52,7 @@ class Pedido {
         return $consulta->fetchObject('Pedido');
     }
 
-    public static function obtenerProdcutosDelPedido($idPedido, $rol) {
+    public static function obtenerProductosDelPedido($idPedido, $rol) {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $zona = "";
         switch($rol){
@@ -66,8 +74,8 @@ class Pedido {
             $consulta = $objAccesoDatos->prepararConsulta("
             SELECT 
             ped.idPedido as Pedido , ped.idMesa as Mesa, idProductopedido as Nro_detalle, 
-            ped.estado as estado_pedido, prodped.estado as estado_item, nombre as nombre_del_prodcuto, cant
-            FROM pedido as ped
+            ped.estado as estado_pedido, prodped.estado as estado_item, nombre as nombre_del_prodcuto, cant, prodped.tiempoPreparacion
+            FROM productopedido as ped
             inner join productopedido as prodPed
             on ped.idPedido = prodPed.idPedido
             inner join producto as prod
@@ -76,15 +84,9 @@ class Pedido {
             and zona = '{$zona}'");
         }else{
             $consulta = $objAccesoDatos->prepararConsulta("
-            SELECT 
-            ped.idPedido as Pedido , ped.idMesa as Mesa, idProductopedido as Nro_detalle, 
-            ped.estado , nombre as nombre_del_prodcuto, cant, hecho
-            FROM pedido as ped
-            inner join productopedido as prodPed
-            on ped.idPedido = prodPed.idPedido
-            inner join producto as prod
-            on prodPed.idProducto = prod.idProducto
-            where :idPedido = ped.idPedido");
+            SELECT *
+            FROM productopedido
+            where idPedido = :idPedido");
         }
 
         $consulta->bindValue(':idPedido', $idPedido, PDO::PARAM_INT);
@@ -104,7 +106,6 @@ class Pedido {
         return $chars;
     }
     public static function obtenerIdPedido($idPedido) {
-        
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT idPedido
                                                        FROM pedido 
@@ -132,6 +133,7 @@ class Pedido {
         }
         $consulta->execute();
     }
+    
 
     public static function generarCodigo(){
         do{
@@ -155,16 +157,17 @@ class Pedido {
 
     public static function demora($idPedido, $idMesa){
 
-    //     $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
         
-    //     $consulta = $objAccesoDatos->prepararConsulta("SELECT MAX(tiempoPreparacion) 
-    //                                                    FROM productopedido as prodped
-    //                                                    INNER JOIN pedido as ped
-    //                                                    on prodped.idPedido = ped.idPedido
-    //                                                    WHERE ped.idPedido = '{$idPedido}' 
-    //                                                    and idMesa = {$idMesa}");
-                                                       
-    //     $consulta->execute();
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT TIMEDIFF( ped.horaHecho, max(prodPed.tiempoPreparacion)) as hora_de_pedido
+                                                       FROM pedido as ped 
+                                                       INNER JOIN productopedido as prodPed
+                                                       on ped.idPedido = prodPed.idPedido
+                                                       WHERE ped.idPedido = '{$idPedido}'
+                                                       AND ped.idMesa = {$idMesa}");
+
+        $consulta->execute();
+        return $consulta->fetch();
     }
     public static function borrarMesa($idPedido) {
         // $objAccesoDato = AccesoDatos::obtenerInstancia();

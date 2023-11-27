@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 24-11-2023 a las 18:07:13
+-- Tiempo de generación: 27-11-2023 a las 21:29:12
 -- Versión del servidor: 10.4.28-MariaDB
 -- Versión de PHP: 8.2.4
 
@@ -24,6 +24,34 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `encuesta`
+--
+
+CREATE TABLE `encuesta` (
+  `idEncuesta` int(11) NOT NULL,
+  `idPedido` varchar(6) NOT NULL,
+  `mesa` int(11) NOT NULL,
+  `restaurante` int(11) NOT NULL,
+  `mozo` int(11) NOT NULL,
+  `cocinero` int(11) NOT NULL,
+  `encuesta` varchar(66) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `factura`
+--
+
+CREATE TABLE `factura` (
+  `idFactura` int(11) NOT NULL,
+  `idPedido` varchar(6) NOT NULL,
+  `propina` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `mesa`
 --
 
@@ -40,7 +68,9 @@ CREATE TABLE `mesa` (
 --
 
 INSERT INTO `mesa` (`IdMesa`, `idPersonal`, `cantComensales`, `rota`, `estado`) VALUES
-(10000, 3, 5, 0, 'con cliente comiendo');
+(10000, 6, 2, 0, 'con cliente pagando'),
+(10002, 6, 2, 0, 'con cliente esperando pedido'),
+(10003, 6, 2, 0, 'cerrada');
 
 -- --------------------------------------------------------
 
@@ -52,19 +82,16 @@ CREATE TABLE `pedido` (
   `idPedido` varchar(255) NOT NULL,
   `estado` varchar(255) NOT NULL,
   `idMesa` int(255) NOT NULL,
-  `nombreCliente` varchar(255) NOT NULL
+  `nombreCliente` varchar(255) NOT NULL,
+  `horaHecho` time NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `pedido`
 --
 
-INSERT INTO `pedido` (`idPedido`, `estado`, `idMesa`, `nombreCliente`) VALUES
-('47KSz', 'en preparación', 10000, 'roberto'),
-('87ExI', 'en preparación', 10000, 'roberto'),
-('87SVX', 'en preparación', 10000, 'roberto'),
-('95ROJ', 'en preparación', 10000, 'roberto'),
-('98MHN', 'pendiente', 10000, 'roberto');
+INSERT INTO `pedido` (`idPedido`, `estado`, `idMesa`, `nombreCliente`, `horaHecho`) VALUES
+('84pIm', 'servido', 10000, 'campeon', '16:46:06');
 
 -- --------------------------------------------------------
 
@@ -108,7 +135,7 @@ INSERT INTO `personal` (`idPersonal`, `nombre`, `apellido`, `contrasenia`, `DNI`
 CREATE TABLE `producto` (
   `idProducto` int(255) NOT NULL,
   `nombre` varchar(255) NOT NULL,
-  `tiempoPreparacion` int(50) NOT NULL,
+  `tiempoPreparacion` time NOT NULL,
   `zona` varchar(255) NOT NULL,
   `baja` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -118,13 +145,14 @@ CREATE TABLE `producto` (
 --
 
 INSERT INTO `producto` (`idProducto`, `nombre`, `tiempoPreparacion`, `zona`, `baja`) VALUES
-(4, 'coca', 1, 'cocina', 0),
-(5, 'super pancho', 10, 'cocina', 0),
-(20, 'milanesa', 40, 'cocina', 0),
-(29, 'milanesa a caballo', 40, 'cocina', 0),
-(37, 'hamburguesa de garbanzo', 30, 'cocina', 0),
-(38, 'corona', 5, 'barra de choperas', 0),
-(39, 'daikiri', 8, 'barra de tragos y vinos', 0);
+(4, 'coca', '00:40:00', 'cocina', 0),
+(5, 'super pancho', '00:00:50', 'cocina', 0),
+(20, 'milanesa', '00:00:00', 'cocina', 0),
+(29, 'milanesa a caballo', '00:40:00', 'cocina', 0),
+(37, 'hamburguesa de garbanzo', '00:00:00', 'cocina', 0),
+(38, 'corona', '00:00:00', 'barra de choperas', 0),
+(39, 'daikiri', '00:00:00', 'barra de tragos y vinos', 0),
+(40, 'cheesecake', '00:00:00', 'Candy Bar', 0);
 
 -- --------------------------------------------------------
 
@@ -137,22 +165,27 @@ CREATE TABLE `productopedido` (
   `idProducto` int(255) NOT NULL,
   `idPedido` varchar(255) NOT NULL,
   `cant` int(255) NOT NULL,
-  `tiempoPreparacion` int(255) NOT NULL
+  `tiempoPreparacion` time NOT NULL,
+  `estado` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `productopedido`
---
-
-INSERT INTO `productopedido` (`idProductoPedido`, `idProducto`, `idPedido`, `cant`, `tiempoPreparacion`) VALUES
-(40, 29, '98MHN', 1, 40),
-(41, 37, '98MHN', 2, 30),
-(42, 38, '98MHN', 1, 5),
-(43, 39, '98MHN', 1, 8);
 
 --
 -- Índices para tablas volcadas
 --
+
+--
+-- Indices de la tabla `encuesta`
+--
+ALTER TABLE `encuesta`
+  ADD PRIMARY KEY (`idEncuesta`),
+  ADD KEY `idPedido` (`idPedido`);
+
+--
+-- Indices de la tabla `factura`
+--
+ALTER TABLE `factura`
+  ADD PRIMARY KEY (`idFactura`),
+  ADD KEY `idPedido` (`idPedido`);
 
 --
 -- Indices de la tabla `mesa`
@@ -193,10 +226,22 @@ ALTER TABLE `productopedido`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `encuesta`
+--
+ALTER TABLE `encuesta`
+  MODIFY `idEncuesta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de la tabla `factura`
+--
+ALTER TABLE `factura`
+  MODIFY `idFactura` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT de la tabla `mesa`
 --
 ALTER TABLE `mesa`
-  MODIFY `IdMesa` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10002;
+  MODIFY `IdMesa` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10004;
 
 --
 -- AUTO_INCREMENT de la tabla `personal`
@@ -208,17 +253,29 @@ ALTER TABLE `personal`
 -- AUTO_INCREMENT de la tabla `producto`
 --
 ALTER TABLE `producto`
-  MODIFY `idProducto` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `idProducto` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT de la tabla `productopedido`
 --
 ALTER TABLE `productopedido`
-  MODIFY `idProductoPedido` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `idProductoPedido` int(255) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=111;
 
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `encuesta`
+--
+ALTER TABLE `encuesta`
+  ADD CONSTRAINT `encuesta_ibfk_1` FOREIGN KEY (`idPedido`) REFERENCES `pedido` (`idPedido`);
+
+--
+-- Filtros para la tabla `factura`
+--
+ALTER TABLE `factura`
+  ADD CONSTRAINT `factura_ibfk_1` FOREIGN KEY (`idPedido`) REFERENCES `pedido` (`idPedido`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `mesa`
