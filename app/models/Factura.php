@@ -3,16 +3,18 @@ class Factura {
     public $idFactura;
     public $idPedido;
     public $propina;
+    public $precio;
 
     public function crearFactura() {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
 
         $consulta = $objAccesoDatos->prepararConsulta(
-        "INSERT INTO Factura (idFactura,idPedido,propina) 
-        VALUES (:idFactura,:idPedido,:propina)");
+        "INSERT INTO Factura (idFactura,idPedido,propina,precio) 
+        VALUES (:idFactura,:idPedido,:propina,:precio)");
         $consulta->bindValue(':idFactura', '',PDO::PARAM_INT);
         $consulta->bindValue(':idPedido', $this->idPedido, PDO::PARAM_STR);
         $consulta->bindValue(':propina', $this->propina, PDO::PARAM_INT);
+        $consulta->bindValue(':precio', $this->precio, PDO::PARAM_INT);
         
         $consulta->execute();
         

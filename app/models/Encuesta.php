@@ -57,4 +57,41 @@ class Encuesta {
 
     public static function borrarEncuesta($idEncuesta) {
     }
+
+    public static function mejoresComentarios(){
+        $objAccesoDatos = AccesoDatos::obtenerInstancia();
+        $suma = 0;
+        $consulta = $objAccesoDatos->prepararConsulta("SELECT *
+                                                       FROM encuesta");
+        $consulta->execute();
+        $resultados = $consulta->fetchAll();
+        $suma = 0;
+        $encuestasCuentas = array();
+        $encuestas = array();
+        $sumaPuntajes = 0;
+
+        for($i = 0 ; $i < count($resultados) ; $i++){
+            $encuestasCuentas[$i]['idPedido'] = $resultados[$i]['idPedido'];
+            $encuestasCuentas[$i]['mesa'] = $resultados[$i]['mesa'];
+            $encuestasCuentas[$i]['restaurante'] = $resultados[$i]['restaurante'];
+            $encuestasCuentas[$i]['mozo'] = $resultados[$i]['mozo'];
+            $encuestasCuentas[$i]['cocinero'] = $resultados[$i]['cocinero'];
+            $encuestasCuentas[$i]['encuesta'] = $resultados[$i]['encuesta'];
+            $encuestasCuentas[$i]['suma'] = $resultados[$i]['mesa'] + 
+                                            $resultados[$i]['restaurante'] + 
+                                            $resultados[$i]['mozo'] + 
+                                            $resultados[$i]['cocinero'];
+            $sumaPuntajes += $encuestasCuentas[$i]['suma'];
+        }
+        $promedio = $sumaPuntajes / count($resultados);
+
+        $i = 0;
+        foreach($encuestasCuentas as $encuesta){
+            if($encuesta['suma'] > $promedio ){
+                $encuestas[$i] = $encuesta;
+                $i++;
+            }
+        }
+        return $encuestas;
+    }
 }

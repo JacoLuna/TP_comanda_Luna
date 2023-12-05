@@ -7,11 +7,6 @@ class productoPedido {
     public $tiempoPreparacion;
     public $cant;
     public $estado;
-    // public static $estadosDisponibles = [
-    //     "pendiente",            //solo mozos y socios pueden settear este estado
-    //     "en preparación",       //solo empleados de cocina, barra y socios pueden settear este estado
-    //     "listo para servir",    //solo empleados de cocina, barra y socios pueden settear este estado
-    //     "servido"]; 
 
     public function crearProductoPedido() {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
@@ -28,14 +23,12 @@ class productoPedido {
 
         return $objAccesoDatos->obtenerUltimoId();
     }
-    //ver si lo de abajo persiste
     public static function obtenerTodos() {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT * FROM productoPedido");
         $consulta->execute();
         return $consulta->fetchAll(PDO::FETCH_CLASS, 'productoPedido');
     }
-
     public static function obtenerProductoPedido($idProductoPedido) {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT * 
@@ -45,7 +38,6 @@ class productoPedido {
         $consulta->execute();
         return $consulta->fetchObject('productoPedido');
     }
-
     public static function obtenerCountDetalles($idPedido) {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT count(idProductoPedido) 
@@ -55,7 +47,6 @@ class productoPedido {
         $consulta->execute();
         return $consulta->fetch();
     }
-
     public static function obtenerIdProductoPedido($idProductoPedido) {
         
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
@@ -66,15 +57,24 @@ class productoPedido {
         $consulta->execute();
         return $consulta->fetchObject('ProductoPedido');
     }
-
-    public static function modificarProductoPedido($idProductoPedido, $estado) {
+    public static function modificarProductoPedido($idProductoPedido, $estado, $tiempo = -1) {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDato->prepararConsulta("UPDATE productoPedido
-                                                      SET estado = '{$estado}'
-                                                      WHERE idProductoPedido = {$idProductoPedido}");
+
+        if($tiempo == -1){
+            $consulta = $objAccesoDato->prepararConsulta(
+                "UPDATE productoPedido
+                SET estado = '{$estado}'
+                WHERE idProductoPedido = {$idProductoPedido}");
+        }else{
+            $consulta = $objAccesoDato->prepararConsulta(
+                "UPDATE productoPedido
+                 SET estado = '{$estado}', 
+                     tiempoPreparacion = '{$tiempo}'
+                 WHERE idProductoPedido = {$idProductoPedido}");
+        }
+
         $consulta->execute();
     }
-
     public static function detalleEstadoDelPedido($idPedido, $estado) {
         $objAccesoDato = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDato->prepararConsulta("SELECT count(estado) 
@@ -84,7 +84,6 @@ class productoPedido {
         $consulta->execute();
         return $consulta->fetch();
     }
-    
     public static function obtenerDetallesPedido($idPedido) {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
         $consulta = $objAccesoDatos->prepararConsulta("SELECT idProductoPedido 

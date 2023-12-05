@@ -13,11 +13,13 @@ class ProductoController extends Producto implements IApiUsable {
         $nombre = $parametros['nombre'];
         $tiempoPreparacion = $parametros['tiempoPreparacion'];
         $zona = $parametros['zona'];
+        $precio = $parametros['precio'];
 
         $usr = new Producto();
         $usr->nombre = $nombre;
         $usr->tiempoPreparacion = $tiempoPreparacion;
         $usr->zona = $zona;
+        $usr->precio = $precio;
         $usr->crearProducto();
 
         $payload = json_encode(array("mensaje" => "Producto creado con exito"));
@@ -26,24 +28,6 @@ class ProductoController extends Producto implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
-    // static function cargarProductos($productos) {
-    //     $prodStr = "";
-    //     if ($productos != null) {
-    //         for ($i = 0; $i < count($productos); $i++) {
-    //             for ($j = 0; $j < count($productos[$i]); $j++) {
-
-    //                 if ($j == count($productos[$i]) - 1) {
-    //                     $prodStr .= $productos[$i][$j];
-    //                 } else {
-    //                     $prodStr .= $productos[$i][$j] . ",";
-    //                 }
-    //             }
-    //             array_push(self::$productosStr, $prodStr);
-    //             $prodStr = "";
-    //         }
-    //     }
-    // }
 
     public function TraerUno($request, $response, $args) {
         $usr = $args['idProducto'];
@@ -54,13 +38,11 @@ class ProductoController extends Producto implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
     private function TraerID($args) {
         $usr = $args['idProducto'];
         $codigo = Producto::obtenerIdProducto($usr);
         return $codigo;
     }
-
     public function TraerTodos($request, $response, $args) {
         $lista = Producto::obtenerTodos();
         $payload = json_encode(array("listaProducto" => $lista), JSON_PRETTY_PRINT);
@@ -70,7 +52,6 @@ class ProductoController extends Producto implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-    //CONTROLAR
     public function ModificarUno($request, $response, $args) {
         $idPersonal = $this->TraerID($args);
         $parametros = $request->getParsedBody();
@@ -86,7 +67,6 @@ class ProductoController extends Producto implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
     public function BorrarUno($request, $response, $args) {
         $idPersonal = $this->TraerID($args);
         Producto::borrarProducto($idPersonal->idPersonal);
@@ -97,7 +77,6 @@ class ProductoController extends Producto implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
     public function cargarArchivoCsv($request, $response, $args) {
         $uploadedFile = $request->getUploadedFiles()['productos'];
         $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
@@ -121,7 +100,6 @@ class ProductoController extends Producto implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
     private function cargarProductosDesdeCSV($rutaArchivo) {
         $retorno = false;
 
@@ -152,7 +130,6 @@ class ProductoController extends Producto implements IApiUsable {
         }
         return $retorno;
     }
-    
     public function descargarArchivoCsv($request, $response, $args) {
         $data = $this->castProductosToCSV();
         
@@ -176,7 +153,6 @@ class ProductoController extends Producto implements IApiUsable {
     
         return $response;
     } 
-
     private static function castProductosToCSV() {
         $productos = Producto::obtenerTodos();
         foreach($productos as $index => $producto) {
@@ -185,7 +161,6 @@ class ProductoController extends Producto implements IApiUsable {
         }
         return $data;
     }
-
     private function guardarArchivoSCV($rutaArchivo, $datos = array()) {
         $rows = "";
         if (!$archivo = fopen($rutaArchivo, "w")) {

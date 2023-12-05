@@ -48,7 +48,6 @@ class MesaController extends Mesa implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
     public function ModificarUno($request, $response, $args) {
         $idMesa = $this->TraerID($args);
         $parametros = $request->getParsedBody();
@@ -67,7 +66,6 @@ class MesaController extends Mesa implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
     public function cambiarEstado($request, $response, $args) {
         $idMesa = $this->TraerID($args);
         $parametros = $request->getParsedBody();
@@ -82,13 +80,19 @@ class MesaController extends Mesa implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
     public function BorrarUno($request, $response, $args) {
         $idMesa = $this->TraerID($args);
         Mesa::borrarMesa($idMesa->idMesa);
 
         $payload = json_encode(array("mensaje" => "Mesa borrada con exito"));
 
+        $response->getBody()->write($payload);
+        return $response
+            ->withHeader('Content-Type', 'application/json');
+    }
+    public function TraerMesaMasUsada($request, $response, $args) {
+        $mesa = Mesa::obtenerMesaMasUsada();
+        $payload = json_encode(array("mensaje" => "la mesa mas usada fue la " . $mesa[0]['IdMesa'] . " " . $mesa[0]['cont'] . " veces"));
         $response->getBody()->write($payload);
         return $response
             ->withHeader('Content-Type', 'application/json');

@@ -8,10 +8,11 @@ class FacturaController extends Factura implements IApiUsable {
 
         $idPedido = $parametros['idPedido'];
         $propina = $parametros['propina'];
-
+        $precio = Pedido::precio($idPedido);
         $usr = new Factura();
         $usr->idPedido = $idPedido;
         $usr->propina = $propina;
+        $usr->precio = $precio;
         $usr->crearFactura();
 
         $payload = json_encode(array("mensaje" => "Factura creada con exito"));

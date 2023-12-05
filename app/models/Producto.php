@@ -5,11 +5,12 @@ class Producto {
     public $tiempoPreparacion;
     public $zona;
     public $baja = false;
+    public $precio;
 
     public function crearProducto() {
         $objAccesoDatos = AccesoDatos::obtenerInstancia();
-        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO producto (idProducto, nombre, tiempoPreparacion, zona, baja) 
-        VALUES (:idProducto, :nombre, :tiempoPreparacion, :zona, :baja)");
+        $consulta = $objAccesoDatos->prepararConsulta("INSERT INTO producto (idProducto, nombre, tiempoPreparacion, zona, baja, precio) 
+        VALUES (:idProducto, :nombre, :tiempoPreparacion, :zona, :baja, :precio)");
         if($this->idProducto == -1){
             $consulta->bindValue(':idProducto', '', PDO::PARAM_INT);
         }else{
@@ -19,6 +20,7 @@ class Producto {
         $consulta->bindValue(':tiempoPreparacion', $this->tiempoPreparacion, PDO::PARAM_INT);
         $consulta->bindValue(':zona', $this->zona, PDO::PARAM_STR);
         $consulta->bindValue(':baja', $this->baja, PDO::PARAM_BOOL);
+        $consulta->bindValue(':precio', $this->precio, PDO::PARAM_INT);
         $consulta->execute();
 
         return $objAccesoDatos->obtenerUltimoId();

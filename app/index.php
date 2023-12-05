@@ -18,6 +18,7 @@ require_once './middlewares/SocioMiddleware.php';
 require_once './middlewares/PedidoStateMiddleware.php';
 require_once './middlewares/MesaStateMiddleware.php';
 require_once './middlewares/AuthMiddleware.php';
+require_once './middlewares/PedidoMiddleware.php';
 require_once './utilities/AutentificadorJWT.php';
 require_once './utilities/Utilities.php';
 
@@ -53,6 +54,7 @@ $app->group('/personal', function (RouteCollectorProxy $group) {
 $app->group('/mesa', function (RouteCollectorProxy $group) {
 
   $group->get('[/]', \MesaController::class . ':TraerTodos');
+  $group->get('/masUsada', \MesaController::class . ':TraerMesaMasUsada');
   $group->get('/{idMesa}', \MesaController::class . ':TraerUno');
 
   $group->post('[/]', \MesaController::class . ':CargarUno')
@@ -67,16 +69,18 @@ $app->group('/mesa', function (RouteCollectorProxy $group) {
 
   $group->delete('/{idMesa}', \MesaController::class . ':BorrarUno')
     ->add(new SocioMiddleware);
-})->add(new AuthMiddleware);
+// })->add(new AuthMiddleware);
+});
 
 $app->group('/pedido', function (RouteCollectorProxy $group) {
   $group->get('[/]', \PedidoController::class . ':TraerTodos');
   $group->get('/estado', \PedidoController::class . ':traerPedidosEstado');
+  $group->get('/demoras', \PedidoController::class . ':TraerTodosConTiempo');
   $group->get('/{idPedido}', \PedidoController::class . ':TraerUno');
   $group->get('/{idPedido}/{idMesa}', \PedidoController::class . ':TiempoDemora');
 
   $group->post('[/]', \PedidoController::class . ':CargarUno')
-    ->add(new SocioMiddleware);
+    ->add(new PedidoMiddleware);
 
   $group->put('/{idPedido}', \PedidoController::class . ':ModificarUno');
   $group->put('/{idPedido}/mozo', \PedidoController::class . ':ModificarUno')
@@ -84,12 +88,12 @@ $app->group('/pedido', function (RouteCollectorProxy $group) {
 
   $group->delete('/{idPedido}', \PedidoController::class . ':BorrarUno')
     ->add(new SocioMiddleware);
-  // });
 })->add(new AuthMiddleware);
 
 $app->group('/detalle', function (RouteCollectorProxy $group) {
   $group->put('/{idProductoPedido}/cocinas_barras', \ProductoPedidoController::class . ':ModificarUno')
     ->add(new PedidoStateMiddleware());
+// });
 })->add(new AuthMiddleware);
 
 $app->group('/producto', function (RouteCollectorProxy $group) {
@@ -112,10 +116,10 @@ $app->group('/producto', function (RouteCollectorProxy $group) {
     ->add(new SocioMiddleware);
 })->add(new AuthMiddleware);
 
-
 $app->group('/encuesta', function (RouteCollectorProxy $group) {
 
   $group->get('[/]', \EncuestaController::class . ':TraerTodos');
+  $group->get('/mejoresComentarios', \EncuestaController::class . ':TraerMejoresComentarios');
   $group->get('/{idEncuesta}', \EncuestaController::class . ':TraerUno');
 
   $group->post('[/]', \EncuestaController::class . ':CargarUno');
@@ -127,5 +131,7 @@ $app->group('/factura', function (RouteCollectorProxy $group) {
   $group->get('/{idFactura}', \FacturaController::class . ':TraerUno');
 
   $group->post('[/]', \FacturaController::class . ':CargarUno');
-});
+// });
+})->add(new AuthMiddleware);
+
 $app->run();

@@ -1,4 +1,7 @@
 <?php
+
+use Psr7Middlewares\Middleware\Payload;
+
 require_once './models/Pedido.php';
 require_once './interfaces/IApiUsable.php';
 
@@ -22,11 +25,7 @@ class PedidoController extends Pedido implements IApiUsable {
             $productoPedido->idProducto = $prodActual->idProducto;
             $productoPedido->idPedido = $ultimoId;
             $productoPedido->cant =  $producto['cantidad'];
-            
-            $seconds = strtotime("1970-01-01 $prodActual->tiempoPreparacion UTC");
-            $multiply = $seconds * $producto['cantidad'];
-            $time = gmdate("H:i:s",$multiply);
-            $productoPedido->tiempoPreparacion = $time;
+            $productoPedido->tiempoPreparacion = 0;
             $productoPedido->crearProductoPedido();
         }
 
@@ -48,7 +47,6 @@ class PedidoController extends Pedido implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
     public function TraerUno($request, $response, $args) {
         $usr = $args['idPedido'];
         $data = AutentificadorJWT::ObtenerDataWithHeader($request->getHeaderLine('Authorization'));
@@ -61,13 +59,6 @@ class PedidoController extends Pedido implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
-    private function TraerID($args) {
-        $usr = $args['idPedido'];
-        $id = Pedido::obtenerIdPedido($usr);
-        return $id;
-    }
-
     public function TraerTodos($request, $response, $args) {
         $lista = Pedido::obtenerTodos();
         $payload = json_encode(array("listaPedidos" => $lista), JSON_PRETTY_PRINT);
@@ -77,7 +68,6 @@ class PedidoController extends Pedido implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
     public function ModificarUno($request, $response, $args) {
         $parametros = $request->getParsedBody();
         $idPedido = $args['idPedido'];
@@ -117,40 +107,56 @@ class PedidoController extends Pedido implements IApiUsable {
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
+    public function BorrarUno($request, $response, $args) {
+    }
+    private function TraerID($args) {
+        $usr = $args['idPedido'];
+        $id = Pedido::obtenerIdPedido($usr);
+        return $id;
+    }
     public function TiempoDemora($request, $response, $args){
         $parametros = $request->getParsedBody();
         $idPedido = $args['idPedido'];
         $idMesa = $args['idMesa'];
         
-        $consulta = Pedido::demora($idPedido, $idMesa);
-        $payload = json_encode(array("el pedido estará aproximadamente a las " => $consulta['hora_de_pedido']));
+        $payload = json_encode(array("el pedido estará aproximadamente a las " => $this->calcularHora($idPedido, $idMesa)));
         $response->getBody()->write($payload);
 
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-
     public function traerPedidosEstado($request, $response, $args) {
         $params = $request->getQueryParams();
         $estado = $params['estado'];
         $lista = Pedido::obtenerTodos($estado);
-        $payload = json_encode(array("lista de Pedidos listos en " . $estado => $lista), JSON_PRETTY_PRINT);
+        $payload = json_encode(array("lista de Pedidos " . $estado => $lista), JSON_PRETTY_PRINT);
 
         $response->getBody()->write($payload);
 
         return $response
             ->withHeader('Content-Type', 'application/json');
     }
-//CONTROLAR
-    public function BorrarUno($request, $response, $args) {
-        // $id = $this->TraerID($args);
-        // Pedido::BorrarUno($id->id);
+    public function TraerTodosConTiempo($request, $response, $args){
+        $pedidos = Pedido::obtenerTodos();
+        $payload = "";
+        $data = AutentificadorJWT::ObtenerDataWithHeader($request->getHeaderLine('Authorization'));
 
-        // $payload = json_encode(array("mensaje" => "Pedido borrado con exito"));
+        for($i = 0 ; $i < count($pedidos) ; $i++){
+            $payload .= json_encode( array("pedido" => $pedidos[$i]->idPedido,
+                                           "hora de entrega" => $this->calcularHora($pedidos[$i]->idPedido, $pedidos[$i]->idMesa)));
+        } 
 
-        // $response->getBody()->write($payload);
-        // return $response
-        //     ->withHeader('Content-Type', 'application/json');
+        $response->getBody()->write($payload);
+
+        return $response
+            ->withHeader('Content-Type', 'application/json');
+    }
+    private function calcularHora($idPedido, $idMesa){
+        $consulta = Pedido::demora($idPedido, $idMesa);
+        $horas = substr($consulta['hora_de_pedido'], 0, 2);
+        $minutos = substr($consulta['hora_de_pedido'], 2, 2);
+        $segundos = substr($consulta['hora_de_pedido'], 4, 2);
+        $tiempo = date('H:i:s', strtotime("00/00/0000" . $horas . " hours " . $minutos . " minutes " . $segundos . " seconds"));
+        return $tiempo;
     }
 }
